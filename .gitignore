@@ -41,3 +41,6 @@ __pycache__/
 # 临时文件
 tmp/
 temp/
+
+# 工具快照目录
+.alma-snapshots/
