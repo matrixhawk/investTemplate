@@ -1,0 +1,312 @@
+# 数据质量硬约束模板
+# 每次分析前必须填写此模板，数据不通过校验则阻止生成报告
+# 
+# 使用说明：
+# 1. 复制此文件为 config/validation_{stock_code}.yaml
+# 2. 逐项填写数据，必须标注来源和页码
+# 3. 运行 python scripts/validate_data.py config/validation_{stock_code}.yaml
+# 4. 校验通过后才能生成报告
+
+analysis_metadata:
+  stock_code: "03613.HK"  # 股票代码
+  stock_name: "同仁堂国药"  # 公司名称
+  report_date: "2026-03-20"  # 报告日期
+  analyst: ""  # 分析人员
+  annual_report_year: 2025  # 使用的年报年份（强制）
+  annual_report_date: "2026-03-20"  # 年报发布日期
+  data_confidence_level: "S"  # 整体置信度 S/A/B/C/D
+  
+  # 时点检查（强制勾选）
+  validation_checks:
+    - check: "使用最新完整年度年报"
+      checked: false  # 必须改为 true
+    - check: "非预告/快报数据"
+      checked: false
+    - check: "已对比3年历史数据"
+      checked: false
+
+core_financial_data:
+  # ========== 现金数据（S级强制）==========
+  cash_and_bank_balances:
+    value: 0  # 原始数字，不含单位（如2279000000）
+    unit: "HKD"  # HKD/RMB
+    display_unit: "亿港元"  # 显示单位
+    source: ""  # 必须：年报附注编号（如annual_report_note_22）
+    page_number: 0  # 必须：年报页码
+    report_period: "2025-12-31"  # 报表期
+    confidence: "S"  # 必须是S
+    verification_checked: false  # 必须改为 true
+    notes: ""  # 备注（如是否含受限存款）
+  
+  restricted_cash:
+    value: 0  # 受限制存款（需从现金中扣除）
+    source: ""
+    page_number: 0
+    confidence: "S"
+  
+  # ========== 负债数据（S级强制）==========
+  interest_bearing_debt:
+    short_term:
+      value: 0  # 短期借款
+      source: ""  # 如annual_report_note_29
+      page_number: 0
+      confidence: "S"
+    
+    long_term:
+      value: 0  # 长期借款
+      source: ""
+      page_number: 0
+      confidence: "S"
+    
+    bonds:
+      value: 0  # 债券
+      source: ""
+      page_number: 0
+      confidence: "S"
+    
+    lease_liabilities:
+      value: 0  # 租赁负债
+      source: ""
+      page_number: 0
+      confidence: "S"
+    
+    # 自动计算（不要修改）
+    total_calculation: "short_term + long_term + bonds + lease_liabilities"
+    total_value: 0  # 自动计算
+    confidence: "S"
+  
+  total_liabilities:
+    value: 0  # 总负债（用于计算负债率）
+    source: ""
+    page_number: 0
+    confidence: "S"
+  
+  # ========== 利润数据（S级强制）==========
+  revenue:
+    value: 0
+    unit: "HKD"
+    display_unit: "亿港元"
+    source: ""
+    page_number: 0
+    confidence: "S"
+  
+  net_profit:
+    value: 0  # 净利润（含少数股东权益）
+    unit: "HKD"
+    display_unit: "亿港元"
+    source: ""
+    page_number: 0
+    confidence: "S"
+  
+  net_profit_attributable:
+    value: 0  # 归母净利润
+    unit: "HKD"
+    display_unit: "亿港元"
+    source: ""
+    page_number: 0
+    confidence: "S"
+  
+  non_recurring_items:
+    asset_impairment: 0  # 资产减值
+    government_subsidy: 0  # 政府补贴
+    gain_on_disposal: 0  # 出售资产收益
+    total: 0  # 非经常性损益合计
+  
+  # ========== 现金流数据（S级强制）==========
+  operating_cash_flow:
+    value: 0
+    unit: "HKD"
+    display_unit: "亿港元"
+    source: "cash_flow_statement"  # 现金流量表
+    page_number: 0
+    report_period: "2025-12-31"
+    confidence: "S"
+    verification_checked: false
+  
+  capex:
+    value: 0  # 资本开支（购置固定资产支出）
+    unit: "HKD"
+    source: "cash_flow_statement_investing"  # 投资活动现金流
+    page_number: 0
+    confidence: "S"
+    # 注意：必须明确数值，即使为0也要填写
+  
+  dividends_paid:
+    value: 0  # 派息金额
+    unit: "HKD"
+    source: "cash_flow_statement_financing"  # 筹资活动现金流
+  
+  # ========== 股本数据（S级强制）==========
+  total_shares:
+    value: 0  # 总股本（股）
+    source: ""
+    page_number: 0
+    confidence: "S"
+  
+  share_price:
+    value: 0  # 当前股价
+    currency: "HKD"
+    date: "2026-03-20"
+    source: "hkex"  # hkex/bloomberg
+  
+  market_cap:
+    calculation: "total_shares * share_price"
+    value: 0  # 自动计算
+    unit: "HKD"
+    display_unit: "亿港元"
+  
+  # ========== 计算指标（自动计算）==========
+  calculated_metrics:
+    net_cash:
+      formula: "cash_and_bank_balances - restricted_cash - interest_bearing_debt.total"
+      value: 0  # 自动计算
+      display_value: ""  # 如"22.73亿港元"
+      confidence: "A"  # 计算值自动降级为A
+    
+    fcf:
+      formula: "operating_cash_flow - capex"
+      value: 0  # 自动计算
+      display_value: ""
+      confidence: "A"
+    
+    market_cap_ex_cash:
+      formula: "market_cap - net_cash"
+      value: 0  # 自动计算
+      display_value: ""
+    
+    fcf_yield:
+      formula: "fcf / market_cap"
+      value: 0  # 自动计算（如0.12表示12%）
+      display_value: ""
+    
+    fcf_multiple_ex_cash:
+      formula: "market_cap_ex_cash / fcf"
+      value: 0  # 自动计算
+      display_value: ""
+    
+    pe_ratio:
+      formula: "market_cap / net_profit_attributable"
+      value: 0  # 自动计算
+      display_value: ""
+    
+    pb_ratio:
+      formula: "market_cap / net_assets"
+      value: 0  # 自动计算
+      display_value: ""
+    
+    debt_to_asset_ratio:
+      formula: "total_liabilities / total_assets"
+      value: 0  # 自动计算
+      display_value: ""
+    
+    cash_to_market_cap_ratio:
+      formula: "net_cash / market_cap"
+      value: 0  # 自动计算（如0.33表示33%）
+      display_value: ""
+
+# ========== 历史数据对比（强制3年）==========
+historical_comparison:
+  years:
+    - year: 2023
+      revenue: 0
+      net_profit: 0
+      cash: 0
+      debt: 0
+    - year: 2024
+      revenue: 0
+      net_profit: 0
+      cash: 0
+      debt: 0
+    - year: 2025
+      revenue: 0
+      net_profit: 0
+      cash: 0
+      debt: 0
+  
+  variance_analysis:
+    - metric: "cash"
+      current: 0
+      previous: 0
+      variance_percent: 0  # 自动计算
+      explanation: ""  # 变动>30%必须解释
+
+# ========== 交叉验证（强制）==========
+cross_validation:
+  interest_rate_check:
+    interest_income: 0  # 利息收入
+    calculated_rate: 0  # 自动计算（interest_income / cash）
+    expected_range: "1%-5%"
+    status: "PASS"  # PASS/WARNING/FAIL
+    notes: ""
+  
+  interest_expense_check:
+    interest_expense: 0  # 利息支出
+    calculated_rate: 0  # 自动计算（interest_expense / debt）
+    expected_range: "2%-10%"
+    status: "PASS"
+    notes: ""
+  
+  fcf_vs_profit_check:
+    fcf: 0
+    net_profit: 0
+    ratio: 0  # 自动计算（fcf / net_profit）
+    expected_range: ">50%"
+    status: "PASS"
+    notes: ""
+
+# ========== 校验检查点（强制勾选）==========
+validation_checklist:
+  - id: "timing"
+    item: "时点检查：使用的是最新完整年度年报（非中报/季报）"
+    checked: false  # 必须改为 true
+    
+  - id: "unit"
+    item: "单位检查：确认所有数字单位（亿/万/千元）正确无误"
+    checked: false
+    
+  - id: "subject"
+    item: "科目检查：现金≠受限存款，借款≠总负债，区分有息/无息负债"
+    checked: false
+    
+  - id: "calculation"
+    item: "计算检查：手工复核净现金、FCF等计算正确"
+    checked: false
+    
+  - id: "variance"
+    item: "对比检查：与上期数据对比，变动>30%有合理解释"
+    checked: false
+    variance_explanation: ""
+    
+  - id: "source"
+    item: "来源检查：所有数据标注年报页码/附注编号"
+    checked: false
+    
+  - id: "cross_check"
+    item: "交叉验证：利息率、现金/市值比例在合理范围"
+    checked: false
+
+# ========== 数据勘误记录（如有）==========
+data_corrections:
+  has_correction: false
+  corrections:
+    - field: ""
+      original_value: ""
+      corrected_value: ""
+      reason: ""
+      date: ""
+
+# ========== 置信度降级说明（如适用）==========
+confidence_downgrade_reasons:
+  - reason: ""  # 如"资本开支数据年报未明确披露，使用估算值"
+
+# ========== 分析前必须确认的声明（强制）==========
+confirmation:
+  i_confirm:
+    - "所有S级数据直接来自公司年报原文附注"
+    - "已逐项核查现金、负债、利润、现金流数据"
+    - "计算过程已复核，单位确认无误"
+    - "与上期数据对比合理，异常变动已解释"
+    - "了解数据错误将导致分析报告作废"
+  
+  analyst_signature: ""  # 分析人员签名
+  validation_date: ""  # 校验完成日期

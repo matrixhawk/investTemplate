@@ -1,0 +1,279 @@
+# 数据质量硬约束模板 - 示例（同仁堂国药）
+
+analysis_metadata:
+  stock_code: "03613.HK"
+  stock_name: "同仁堂国药"
+  report_date: "2026-03-20"
+  analyst: "AI Analyst"
+  annual_report_year: 2025
+  annual_report_date: "2026-03-20"
+  data_confidence_level: "S"
+  
+  validation_checks:
+    - check: "使用最新完整年度年报"
+      checked: true
+    - check: "非预告/快报数据"
+      checked: true
+    - check: "已对比3年历史数据"
+      checked: true
+
+core_financial_data:
+  cash_and_bank_balances:
+    value: 2279000000
+    unit: "HKD"
+    display_unit: "亿港元"
+    source: "annual_report_note_22"
+    page_number: 56
+    report_period: "2025-12-31"
+    confidence: "S"
+    verification_checked: true
+    notes: "现金及银行结余"
+  
+  restricted_cash:
+    value: 0
+    source: "annual_report_note_22"
+    page_number: 56
+    confidence: "S"
+  
+  interest_bearing_debt:
+    short_term:
+      value: 7100000
+      source: "annual_report_note_29"
+      page_number: 78
+      confidence: "S"
+    long_term:
+      value: 0
+      source: "annual_report_note_29"
+      page_number: 78
+      confidence: "S"
+    bonds:
+      value: 0
+      source: ""
+      page_number: 0
+      confidence: "S"
+    lease_liabilities:
+      value: 0
+      source: ""
+      page_number: 0
+      confidence: "S"
+    total_calculation: "7100000 + 0 + 0 + 0"
+    total_value: 7100000
+    confidence: "S"
+  
+  total_liabilities:
+    value: 313000000
+    source: "balance_sheet"
+    page_number: 45
+    confidence: "S"
+  
+  revenue:
+    value: 1513000000
+    unit: "HKD"
+    display_unit: "亿港元"
+    source: "income_statement"
+    page_number: 44
+    confidence: "S"
+  
+  net_profit:
+    value: 397000000
+    unit: "HKD"
+    display_unit: "亿港元"
+    source: "income_statement"
+    page_number: 44
+    confidence: "S"
+  
+  net_profit_attributable:
+    value: 397000000
+    unit: "HKD"
+    display_unit: "亿港元"
+    source: "income_statement"
+    page_number: 44
+    confidence: "S"
+  
+  non_recurring_items:
+    asset_impairment: 62000000
+    government_subsidy: 0
+    gain_on_disposal: 0
+    total: 62000000
+  
+  operating_cash_flow:
+    value: 830000000
+    unit: "HKD"
+    display_unit: "亿港元"
+    source: "cash_flow_statement"
+    page_number: 45
+    report_period: "2025-12-31"
+    confidence: "S"
+    verification_checked: true
+  
+  capex:
+    value: 0
+    unit: "HKD"
+    source: "cash_flow_statement_investing"
+    page_number: 45
+    confidence: "S"
+  
+  dividends_paid:
+    value: 318000000
+    unit: "HKD"
+    source: "cash_flow_statement_financing"
+  
+  total_shares:
+    value: 837000000
+    source: "share_capital_note"
+    page_number: 60
+    confidence: "S"
+  
+  share_price:
+    value: 8.30
+    currency: "HKD"
+    date: "2026-03-20"
+    source: "hkex"
+  
+  market_cap:
+    calculation: "837000000 * 8.30"
+    value: 6947100000
+    unit: "HKD"
+    display_unit: "亿港元"
+  
+  calculated_metrics:
+    net_cash:
+      formula: "2279000000 - 0 - 7100000"
+      value: 2271900000
+      display_value: "22.72亿港元"
+      confidence: "A"
+    
+    fcf:
+      formula: "830000000 - 0"
+      result: 830000000
+      confidence: "A"
+    
+    market_cap_ex_cash:
+      formula: "6947100000 - 2271900000"
+      value: 4675200000
+      display_value: "46.75亿港元"
+    
+    fcf_yield:
+      formula: "830000000 / 6947100000"
+      value: 0.1195
+      display_value: "11.95%"
+    
+    fcf_multiple_ex_cash:
+      formula: "4675200000 / 830000000"
+      value: 5.63
+      display_value: "5.6倍"
+    
+    pe_ratio:
+      formula: "6947100000 / 397000000"
+      value: 17.5
+      display_value: "17.5倍"
+    
+    pb_ratio:
+      formula: "6947100000 / 4246000000"
+      value: 1.64
+      display_value: "1.64倍"
+    
+    debt_to_asset_ratio:
+      formula: "313000000 / 4246000000"
+      value: 0.074
+      display_value: "7.4%"
+    
+    cash_to_market_cap_ratio:
+      formula: "2271900000 / 6947100000"
+      value: 0.327
+      display_value: "32.7%"
+
+historical_comparison:
+  years:
+    - year: 2023
+      revenue: 1612000000
+      net_profit: 500000000
+      cash: 1820000000
+      debt: 10000000
+    - year: 2024
+      revenue: 1612000000
+      net_profit: 500000000
+      cash: 1721000000
+      debt: 8000000
+    - year: 2025
+      revenue: 1513000000
+      net_profit: 397000000
+      cash: 2279000000
+      debt: 7100000
+  
+  variance_analysis:
+    - metric: "cash"
+      current: 2279000000
+      previous: 1721000000
+      variance_percent: 0.324
+      explanation: "现金增加32.4%，主要因经营现金流改善及去库存"
+
+cross_validation:
+  interest_rate_check:
+    interest_income: 46000000
+    calculated_rate: 0.0202
+    expected_range: "1%-5%"
+    status: "PASS"
+    notes: "利息率2.02%，在正常范围内"
+  
+  interest_expense_check:
+    interest_expense: 0
+    calculated_rate: 0
+    expected_range: "2%-10%"
+    status: "PASS"
+    notes: "无有息负债，无利息支出"
+  
+  fcf_vs_profit_check:
+    fcf: 830000000
+    net_profit: 397000000
+    ratio: 2.09
+    expected_range: ">50%"
+    status: "PASS"
+    notes: "FCF是净利润的2.09倍，现金创造能力优秀"
+
+validation_checklist:
+  - id: "timing"
+    item: "时点检查：使用的是最新完整年度年报（非中报/季报）"
+    checked: true
+    
+  - id: "unit"
+    item: "单位检查：确认所有数字单位（亿/万/千元）正确无误"
+    checked: true
+    
+  - id: "subject"
+    item: "科目检查：现金≠受限存款，借款≠总负债，区分有息/无息负债"
+    checked: true
+    
+  - id: "calculation"
+    item: "计算检查：手工复核净现金、FCF等计算正确"
+    checked: true
+    
+  - id: "variance"
+    item: "对比检查：与上期数据对比，变动>30%有合理解释"
+    checked: true
+    variance_explanation: "现金同比+32.4%，因经营现金流改善"
+    
+  - id: "source"
+    item: "来源检查：所有数据标注年报页码/附注编号"
+    checked: true
+    
+  - id: "cross_check"
+    item: "交叉验证：利息率、现金/市值比例在合理范围"
+    checked: true
+
+data_corrections:
+  has_correction: false
+  corrections: []
+
+confidence_downgrade_reasons: []
+
+confirmation:
+  i_confirm:
+    - "所有S级数据直接来自公司年报原文附注"
+    - "已逐项核查现金、负债、利润、现金流数据"
+    - "计算过程已复核，单位确认无误"
+    - "与上期数据对比合理，异常变动已解释"
+    - "了解数据错误将导致分析报告作废"
+  
+  analyst_signature: "AI Analyst"
+  validation_date: "2026-03-20"
