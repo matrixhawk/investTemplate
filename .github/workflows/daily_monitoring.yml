@@ -2,10 +2,10 @@ name: 每日监控概览生成
 
 on:
   schedule:
-    # A股收盘后 15:30 = UTC 07:30
-    # 港股收盘后 16:30 = UTC 08:30
-    # 选择 09:00 UTC = 北京时间 17:00（两地都收盘后）
-    - cron: '0 9 * * 1-5'
+    # A股收盘 15:00（北京时间）后半小时 -> 15:30 = UTC 07:30
+    # 港股收盘 16:00（香港时间）后半小时 -> 16:30 = UTC 08:30
+    # 统一按港股收盘后半小时执行（适配本项目港股优先）
+    - cron: '30 8 * * 1-5'
   
   # 允许手动触发
   workflow_dispatch:
@@ -31,6 +31,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install yfinance pandas
+
+    - name: 更新模拟投资组合（自动决策）
+      run: |
+        python scripts/update_simulated_portfolio.py
         
     - name: 生成监控概览
       run: |
@@ -41,6 +45,10 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add 07-分析输出/监控概览.md
+        git add 08-决策追踪/每日股价监控.md
+        git add 08-决策追踪/simulation_state.json
+        git add 08-决策追踪/simulation_trades.csv
+        git add 08-决策追踪/simulation_daily_snapshot.csv
         git commit -m "📊 更新每日监控概览 $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
         git push
         
@@ -59,6 +67,10 @@ jobs:
               // 提取接近买点的部分
               const match = content.match(/## 🔥 接近买点[\s\S]*?(?=## |$)/);
               if (match) {
+                // 空列表提示时不创建提醒，避免每日噪音Issue
+                if (match[0].includes('当前没有标的接近买点')) {
+                  return;
+                }
                 const title = `🚨 买入提醒 - ${new Date().toISOString().split('T')[0]}`;
                 
                 await github.rest.issues.create({

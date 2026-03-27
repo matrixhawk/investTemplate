@@ -1,0 +1,65 @@
+{
+  "template_version": "V5.5.12",
+  "engine_version": "V1.0",
+  "initial_capital": 500000.0,
+  "cash": 52500.0,
+  "last_trade_date": "2026-03-26",
+  "positions": {
+    "01522.HK": {
+      "name": "京投交通科技",
+      "code": "01522",
+      "ticker": "01522.HK",
+      "lot_size": 2000,
+      "shares": 342000,
+      "avg_cost": 0.365,
+      "initial_investment": 124830.0,
+      "sell_trigger": 0.6,
+      "max_weight": 0.25,
+      "position_type": "核心",
+      "added_cost_total": 0.0,
+      "realized_pnl": 0.0
+    },
+    "87001.HK": {
+      "name": "汇贤产业信托",
+      "code": "87001",
+      "ticker": "87001.HK",
+      "lot_size": 1000,
+      "shares": 250000,
+      "avg_cost": 0.5,
+      "initial_investment": 125000.0,
+      "sell_trigger": 1.0,
+      "max_weight": 0.25,
+      "position_type": "核心",
+      "added_cost_total": 0.0,
+      "realized_pnl": 0.0
+    },
+    "00882.HK": {
+      "name": "天津发展",
+      "code": "00882",
+      "ticker": "00882.HK",
+      "lot_size": 1000,
+      "shares": 40000,
+      "avg_cost": 2.5,
+      "initial_investment": 100000.0,
+      "sell_trigger": 4.5,
+      "max_weight": 0.2,
+      "position_type": "核心",
+      "added_cost_total": 0.0,
+      "realized_pnl": 0.0
+    },
+    "03320.HK": {
+      "name": "华润医药",
+      "code": "03320",
+      "ticker": "03320.HK",
+      "lot_size": 500,
+      "shares": 15000,
+      "avg_cost": 6.5,
+      "initial_investment": 97500.0,
+      "sell_trigger": 9.0,
+      "max_weight": 0.2,
+      "position_type": "卫星",
+      "added_cost_total": 0.0,
+      "realized_pnl": 0.0
+    }
+  }
+}
