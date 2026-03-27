@@ -6,7 +6,7 @@
 1. 拉取模拟组合标的最新收盘价（yfinance）
 2. 按规则执行自动决策（卖出触发 / 回撤加仓）
 3. 更新持仓状态、现金余额、组合净值、收益率
-4. 生成每日监控文件（08-决策追踪/每日股价监控.md）
+4. 生成统一仪表盘快照（08-决策追踪/dashboard_snapshot.json）
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ import json
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 
 import pandas as pd
 import yfinance as yf
@@ -26,7 +26,8 @@ TRACK_DIR = ROOT / "08-决策追踪"
 STATE_FILE = TRACK_DIR / "simulation_state.json"
 TRADES_FILE = TRACK_DIR / "simulation_trades.csv"
 DAILY_FILE = TRACK_DIR / "simulation_daily_snapshot.csv"
-REPORT_FILE = TRACK_DIR / "每日股价监控.md"
+SNAPSHOT_FILE = TRACK_DIR / "dashboard_snapshot.json"
+AI_RECORD_FILE = TRACK_DIR / "AI决策记录.md"
 
 INITIAL_CAPITAL = 500000.0
 START_DATE = "2026-03-26"
@@ -44,7 +45,7 @@ INITIAL_POSITIONS = [
     {
         "name": "京投交通科技",
         "code": "01522",
-        "ticker": "01522.HK",
+        "ticker": "1522.HK",
         "lot_size": 2000,
         "shares": 342000,
         "avg_cost": 0.365,
@@ -68,7 +69,7 @@ INITIAL_POSITIONS = [
     {
         "name": "天津发展",
         "code": "00882",
-        "ticker": "00882.HK",
+        "ticker": "882.HK",
         "lot_size": 1000,
         "shares": 40000,
         "avg_cost": 2.50,
@@ -80,7 +81,7 @@ INITIAL_POSITIONS = [
     {
         "name": "华润医药",
         "code": "03320",
-        "ticker": "03320.HK",
+        "ticker": "3320.HK",
         "lot_size": 500,
         "shares": 15000,
         "avg_cost": 6.50,
@@ -92,16 +93,57 @@ INITIAL_POSITIONS = [
 ]
 
 
+def normalize_hk_ticker(code: str, ticker: str | None = None) -> str:
+    """标准化港股 ticker 为 yfinance 可识别格式（去前导 0）。"""
+    if ticker and ticker.endswith(".HK"):
+        raw = ticker[:-3]
+    else:
+        raw = str(code).strip()
+    try:
+        num = int(raw)
+        if num <= 9999:
+            return f"{num:04d}.HK"
+        return f"{num}.HK"
+    except ValueError:
+        return f"{raw}.HK"
+
+
+def normalize_state_positions(positions: Dict[str, Dict]) -> Tuple[Dict[str, Dict], bool]:
+    """兼容迁移旧版 5 位港股 ticker 键。"""
+    normalized: Dict[str, Dict] = {}
+    changed = False
+    for old_key, pos in positions.items():
+        code = str(pos.get("code", ""))
+        new_key = normalize_hk_ticker(code, str(pos.get("ticker", old_key)))
+        if new_key != old_key:
+            changed = True
+        pos["ticker"] = new_key
+        normalized[new_key] = pos
+    return normalized, changed
+
+
 def ensure_state() -> Dict:
     """初始化状态文件。"""
     TRACK_DIR.mkdir(parents=True, exist_ok=True)
     if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        positions, changed = normalize_state_positions(state.get("positions", {}))
+        if changed:
+            state["positions"] = positions
+            STATE_FILE.write_text(
+                json.dumps(state, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        # 兼容老版本：即使状态文件已存在，也补齐交易/快照基线文件
+        seed_baseline_files(state)
+        return state
 
     positions: Dict[str, Dict] = {}
     for row in INITIAL_POSITIONS:
-        positions[row["ticker"]] = {
+        ticker = normalize_hk_ticker(row["code"], row["ticker"])
+        positions[ticker] = {
             **row,
+            "ticker": ticker,
             "added_cost_total": 0.0,
             "realized_pnl": 0.0,
         }
@@ -125,18 +167,24 @@ def ensure_state() -> Dict:
 
 def seed_baseline_files(state: Dict) -> None:
     """首次初始化时写入建仓日基线记录。"""
+    initial_map = {}
+    for row in INITIAL_POSITIONS:
+        tk = normalize_hk_ticker(row["code"], row["ticker"])
+        initial_map[tk] = row
+
     if not TRADES_FILE.exists():
         records = []
-        for p in state["positions"].values():
+        for tk, p in state["positions"].items():
+            base = initial_map.get(tk, p)
             records.append(
                 {
                     "date": START_DATE,
                     "ticker": p["ticker"],
                     "name": p["name"],
                     "action": "INIT_BUY",
-                    "price": p["avg_cost"],
-                    "shares": p["shares"],
-                    "amount": round(p["shares"] * p["avg_cost"], 2),
+                    "price": base["avg_cost"],
+                    "shares": base["shares"],
+                    "amount": round(base["shares"] * base["avg_cost"], 2),
                     "cash_after": START_CASH,
                     "reason": "初始建仓",
                 }
@@ -148,8 +196,9 @@ def seed_baseline_files(state: Dict) -> None:
 
     market_value = 0.0
     rows = []
-    for p in state["positions"].values():
-        mv = p["shares"] * p["avg_cost"]
+    for tk, p in state["positions"].items():
+        base = initial_map.get(tk, p)
+        mv = base["shares"] * base["avg_cost"]
         market_value += mv
         rows.append(
             {
@@ -157,11 +206,11 @@ def seed_baseline_files(state: Dict) -> None:
                 "ticker": p["ticker"],
                 "name": p["name"],
                 "code": p["code"],
-                "close": p["avg_cost"],
-                "prev_close": p["avg_cost"],
+                "close": base["avg_cost"],
+                "prev_close": base["avg_cost"],
                 "change_pct": 0.0,
-                "shares": p["shares"],
-                "avg_cost": p["avg_cost"],
+                "shares": base["shares"],
+                "avg_cost": base["avg_cost"],
                 "action": "INIT",
                 "action_shares": 0,
                 "action_price": 0.0,
@@ -271,102 +320,140 @@ def append_daily_rows(rows: List[Dict]) -> None:
     new_df.to_csv(DAILY_FILE, index=False, encoding="utf-8-sig")
 
 
-def generate_report() -> None:
-    """从 daily snapshot 自动生成监控 Markdown。"""
-    if not DAILY_FILE.exists():
-        return
-
-    df = pd.read_csv(DAILY_FILE, encoding="utf-8-sig")
-    if df.empty:
-        return
-
-    latest_date = str(df["date"].max())
-    today = df[df["date"] == latest_date].copy()
-    today = today.sort_values("ticker")
-
-    total_market_value = float(today["market_value"].sum())
-    cash_after = float(today["cash_after"].iloc[-1])
-    net_value = total_market_value + cash_after
-    total_return = (net_value / INITIAL_CAPITAL - 1) * 100
-
-    lines = [
-        "# 每日股价监控（模拟投资组合-自动更新）",
-        "",
-        f"> **交易日期**：{latest_date}",
-        f"> **更新时间**：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-        "> **决策引擎**：V1.0（卖出触发 + 回撤加仓 + 仓位上限）",
-        "",
-        "---",
-        "",
-        "## 📊 当日持仓与盈亏",
-        "",
-        "| 标的 | 代码 | 持仓股数 | 成本价 | 收盘价 | 涨跌% | 当日动作 | 持仓市值 | 浮动盈亏 |",
-        "|------|------|----------|--------|--------|-------|----------|----------|----------|",
+def build_trade_summary(latest_date: str) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """返回今日操作和最近操作流水。"""
+    if not TRADES_FILE.exists():
+        return ([], [])
+    trades_df = pd.read_csv(TRADES_FILE, encoding="utf-8-sig")
+    if trades_df.empty:
+        return ([], [])
+    trades_df = trades_df.sort_values(["date", "ticker"], ascending=[False, True])
+    today_ops = trades_df[
+        (trades_df["date"] == latest_date)
+        & (trades_df["action"].isin(["BUY_ADD", "SELL"]))
     ]
+    recent_ops = trades_df.head(20)
+    return (today_ops.to_dict("records"), recent_ops.to_dict("records"))
 
-    for _, r in today.iterrows():
-        code = str(r["code"]).zfill(5)
-        lines.append(
-            f"| {r['name']} | {code} | {int(r['shares'])} | "
-            f"{float(r['avg_cost']):.3f} | {float(r['close']):.3f} | "
-            f"{float(r['change_pct']):+.2f}% | {r['action']} | "
-            f"{float(r['market_value']):,.2f} | {float(r['unrealized_pnl']):+,.2f} |"
+
+def parse_ai_decision_summary() -> Dict[str, Any]:
+    """读取 AI决策记录.md 摘要，供仪表盘只读展示。"""
+    if not AI_RECORD_FILE.exists():
+        return {
+            "title": "AI决策记录与追踪",
+            "raw_excerpt": "未找到 AI决策记录.md",
+            "table_rows": [],
+        }
+
+    content = AI_RECORD_FILE.read_text(encoding="utf-8")
+    lines = content.splitlines()
+    excerpt = "\n".join(lines[:120]).strip()
+
+    table_rows: List[Dict[str, str]] = []
+    in_table = False
+    for line in lines:
+        if line.startswith("| 日期 |") and "标的" in line and "操作" in line:
+            in_table = True
+            continue
+        if in_table and line.startswith("|---"):
+            continue
+        if in_table and line.startswith("|"):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) >= 9:
+                table_rows.append(
+                    {
+                        "date": cells[0],
+                        "name": cells[1],
+                        "code": cells[2],
+                        "action": cells[3],
+                        "suggest_price": cells[4],
+                        "current_price": cells[5],
+                        "yield_rate": cells[6],
+                        "reason": cells[7],
+                        "status": cells[8],
+                    }
+                )
+            continue
+        if in_table and line.strip() == "":
+            break
+
+    return {
+        "title": "AI决策记录与追踪",
+        "raw_excerpt": excerpt,
+        "table_rows": table_rows,
+    }
+
+
+def build_dashboard_snapshot(price_map: Dict[str, PricePoint] | None = None) -> Dict[str, Any]:
+    """生成仪表盘快照，作为唯一展示数据源。"""
+    state = ensure_state()
+    latest_date = str(state.get("last_trade_date", START_DATE))
+    cash = float(state.get("cash", START_CASH))
+
+    positions: List[Dict[str, Any]] = []
+    total_market_value = 0.0
+    for ticker, pos in state["positions"].items():
+        shares = int(pos["shares"])
+        avg_cost = float(pos["avg_cost"])
+        pp = (price_map or {}).get(ticker)
+        close_price = float(pp.close) if pp else avg_cost
+        prev_close = float(pp.prev_close) if pp else close_price
+        change_pct = ((close_price / prev_close - 1) * 100) if prev_close else 0.0
+        market_value = shares * close_price
+        unrealized = (close_price - avg_cost) * shares
+        total_market_value += market_value
+        positions.append(
+            {
+                "name": pos["name"],
+                "code": str(pos["code"]).zfill(5),
+                "ticker": ticker,
+                "shares": shares,
+                "avg_cost": round(avg_cost, 6),
+                "close": round(close_price, 4),
+                "change_pct": round(change_pct, 4),
+                "market_value": round(market_value, 2),
+                "unrealized": round(unrealized, 2),
+                "sell_trigger": float(pos.get("sell_trigger", 0)),
+                "status": "实时" if pp else "占位",
+            }
         )
 
-    lines.extend(
-        [
-            f"| **股票合计** | - | - | - | - | - | - | **{total_market_value:,.2f}** | - |",
-            f"| **现金余额** | - | - | - | - | - | - | **{cash_after:,.2f}** | - |",
-            f"| **组合净值** | - | - | - | - | - | - | **{net_value:,.2f}** | **{total_return:+.2f}%** |",
-            "",
-            "## 🧾 当日交易动作",
-            "",
-        ]
+    positions.sort(key=lambda x: x["code"])
+    net_value = total_market_value + cash
+    total_return_pct = (net_value / INITIAL_CAPITAL - 1) * 100
+    today_ops, recent_ops = build_trade_summary(latest_date)
+    ai_summary = parse_ai_decision_summary()
+
+    snapshot = {
+        "meta": {
+            "template_version": "V5.5.12",
+            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "latest_trade_date": latest_date,
+            "source": [
+                "simulation_state.json",
+                "simulation_trades.csv",
+                "simulation_daily_snapshot.csv",
+                "AI决策记录.md",
+            ],
+        },
+        "portfolio": {
+            "initial_capital": INITIAL_CAPITAL,
+            "cash": round(cash, 2),
+            "market_value": round(total_market_value, 2),
+            "net_value": round(net_value, 2),
+            "total_return_pct": round(total_return_pct, 4),
+            "position_ratio_pct": round((total_market_value / INITIAL_CAPITAL) * 100, 4),
+            "positions": positions,
+        },
+        "today_actions": today_ops,
+        "recent_actions": recent_ops,
+        "ai_decisions": ai_summary,
+    }
+    SNAPSHOT_FILE.write_text(
+        json.dumps(snapshot, ensure_ascii=False, indent=2),
+        encoding="utf-8",
     )
-
-    action_rows = today[today["action"].isin(["BUY_ADD", "SELL"])]
-    if action_rows.empty:
-        lines.append("- 今日无交易动作（全部 HOLD）。")
-    else:
-        for _, r in action_rows.iterrows():
-            lines.append(
-                f"- {r['name']} {r['action']}：{int(r['action_shares'])} 股 @ {float(r['action_price']):.3f}，"
-                f"金额 {float(r['action_amount']):,.2f} HKD"
-            )
-
-    lines.extend(
-        [
-            "",
-            "## 📈 最近10个交易日净值",
-            "",
-            "| 日期 | 组合净值 | 累计收益率 |",
-            "|------|----------|------------|",
-        ]
-    )
-
-    net_hist = (
-        df.groupby("date", as_index=False)
-        .agg({"net_value": "last", "total_return_pct": "last"})
-        .sort_values("date")
-        .tail(10)
-    )
-    for _, r in net_hist.iterrows():
-        lines.append(f"| {r['date']} | {float(r['net_value']):,.2f} | {float(r['total_return_pct']):+.2f}% |")
-
-    lines.extend(
-        [
-            "",
-            "## ✅ 规则说明（已自动执行）",
-            "",
-            "1. 卖出规则：收盘价 >= 卖出触发价，自动全仓卖出。",
-            "2. 加仓规则：收盘价 <= 成本价95%，且满足仓位上限/现金上限/加仓预算后，按每手整数自动加仓。",
-            "3. 风控边界：单标仓位不超过组合上限（核心25%，卫星20%），单标累计加仓不超过初始投入30%。",
-            "",
-            f"*模板版本：V5.5.12；最新交易日：{latest_date}*",
-        ]
-    )
-
-    REPORT_FILE.write_text("\n".join(lines), encoding="utf-8")
+    return snapshot
 
 
 def run() -> int:
@@ -380,14 +467,14 @@ def run() -> int:
             price_map[ticker] = pp
 
     if not price_map:
-        print("[WARN] 未获取到任何行情，跳过本次更新。")
-        generate_report()
+        print("[WARN] 未获取到任何行情，生成占位报告。")
+        build_dashboard_snapshot(price_map=None)
         return 0
 
     trade_date = choose_trade_date(price_map)
     if trade_date <= str(state.get("last_trade_date", "")):
         print(f"[INFO] 最新交易日 {trade_date} 未超过已处理日期 {state.get('last_trade_date')}，仅刷新报告。")
-        generate_report()
+        build_dashboard_snapshot(price_map=price_map)
         return 0
 
     cash = float(state["cash"])
@@ -503,7 +590,7 @@ def run() -> int:
 
     append_trade_records(trade_records)
     append_daily_rows(daily_rows)
-    generate_report()
+    build_dashboard_snapshot(price_map=price_map)
 
     print(f"[OK] 模拟组合已更新，交易日: {trade_date}")
     print(f"[OK] 组合净值: {net_value:,.2f} HKD，累计收益率: {total_return_pct:+.2f}%")

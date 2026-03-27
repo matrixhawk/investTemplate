@@ -111,9 +111,7 @@ export default defineConfig({
         text: '🤖 08-决策追踪',
         collapsed: true,
         items: [
-          { text: 'AI决策记录', link: '/08-决策追踪/AI决策记录' },
-          { text: '模拟投资组合（50万港币）', link: '/08-决策追踪/模拟投资组合_50万港币' },
-          { text: '每日股价监控', link: '/08-决策追踪/每日股价监控' }
+          { text: '🎯 模拟持仓', link: '/模拟持仓' }
         ]
       }
     ],
