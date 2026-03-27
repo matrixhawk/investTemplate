@@ -48,6 +48,18 @@
   margin-top: 8px;
 }
 
+body.dashboard-wide .VPDoc .container {
+  max-width: 1500px !important;
+}
+
+body.dashboard-wide .VPDoc .content-container {
+  max-width: 1280px !important;
+}
+
+body.dashboard-wide .VPDoc.has-aside .content-container {
+  max-width: 1220px !important;
+}
+
 .dd-header h1 {
   margin: 0;
   font-size: 34px;
@@ -120,29 +132,70 @@
   color: #92400e;
 }
 
-.dd-tabs {
-  margin-top: 14px;
-  display: flex;
-  gap: 8px;
+.dd-home-links {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.dd-tabs button {
+.dd-home-link {
+  text-align: center;
   border: 1px solid var(--vp-c-divider);
-  background: var(--vp-c-bg-soft);
   border-radius: 10px;
-  padding: 8px 14px;
-  font-weight: 600;
-  cursor: pointer;
+  padding: 10px 8px;
+  text-decoration: none;
+  font-weight: 700;
+  color: #0f766e;
+  background: rgba(14, 165, 164, 0.08);
 }
 
-.dd-tabs button.active {
+.dd-home-link:hover {
   border-color: #0ea5a4;
-  color: #115e59;
-  background: rgba(14, 165, 164, 0.14);
 }
 
 .dd-panel {
   margin-top: 12px;
+}
+
+.dd-subsummary {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--vp-c-text-2);
+}
+
+.dd-plain-summary {
+  margin-top: 6px;
+  border: 1px solid #93c5fd;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(14, 165, 164, 0.08));
+  color: #0f172a;
+  border-radius: 12px;
+  padding: 12px 14px;
+  line-height: 1.65;
+}
+
+.dd-subsummary span {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: var(--vp-c-bg-soft);
+}
+
+.dd-subsummary a {
+  margin-left: auto;
+  text-decoration: none;
+  font-weight: 600;
+  color: #0f766e;
+}
+
+.decision-dashboard table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .dd-empty {
@@ -163,6 +216,15 @@
   padding: 10px;
   background: var(--vp-c-bg-soft);
   white-space: pre-wrap;
+}
+
+.dd-details {
+  margin-top: 10px;
+}
+
+.dd-details summary {
+  cursor: pointer;
+  color: var(--vp-c-text-2);
 }
 
 .decision-stream {
@@ -283,6 +345,10 @@
   }
 
   .decision-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .dd-home-links {
     grid-template-columns: 1fr;
   }
 }

@@ -421,6 +421,8 @@ def build_dashboard_snapshot(price_map: Dict[str, PricePoint] | None = None) -> 
     positions.sort(key=lambda x: x["code"])
     net_value = total_market_value + cash
     total_return_pct = (net_value / INITIAL_CAPITAL - 1) * 100
+    for p in positions:
+        p["weight_pct"] = round((float(p["market_value"]) / net_value) * 100, 4) if net_value else 0.0
     today_ops, recent_ops = build_trade_summary(latest_date)
     ai_summary = parse_ai_decision_summary()
 

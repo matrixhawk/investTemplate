@@ -1,7 +1,7 @@
 {
   "meta": {
     "template_version": "V5.5.12",
-    "generated_at": "2026-03-27 21:01:40",
+    "generated_at": "2026-03-27 21:23:06",
     "latest_trade_date": "2026-03-27",
     "source": [
       "simulation_state.json",
@@ -29,7 +29,8 @@
         "market_value": 101600.0,
         "unrealized": 1600.0,
         "sell_trigger": 4.5,
-        "status": "实时"
+        "status": "实时",
+        "weight_pct": 22.6614
       },
       {
         "name": "京投交通科技",
@@ -42,7 +43,8 @@
         "market_value": 100890.0,
         "unrealized": -23940.0,
         "sell_trigger": 0.6,
-        "status": "实时"
+        "status": "实时",
+        "weight_pct": 22.503
       },
       {
         "name": "华润医药",
@@ -55,7 +57,8 @@
         "market_value": 84600.0,
         "unrealized": -12900.0,
         "sell_trigger": 9.0,
-        "status": "实时"
+        "status": "实时",
+        "weight_pct": 18.8696
       },
       {
         "name": "汇贤产业信托",
@@ -68,7 +71,8 @@
         "market_value": 124845.0,
         "unrealized": -16250.0,
         "sell_trigger": 1.0,
-        "status": "实时"
+        "status": "实时",
+        "weight_pct": 27.8461
       }
     ]
   },
