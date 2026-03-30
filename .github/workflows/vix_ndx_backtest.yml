@@ -1,0 +1,37 @@
+name: VIX-Nasdaq100 Backtest
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 每月1号 UTC 08:00 运行（北京时间16:00）
+    - cron: '0 8 1 * *'
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install yfinance pandas matplotlib numpy
+
+      - name: Run backtest
+        run: |
+          cd scripts
+          python vix_ndx_backtest.py
+
+      - name: Commit and push results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "05-策略框架/VIX-纳斯达克100定投策略/"
+          git diff --cached --quiet || (git commit -m "自动更新 VIX-纳斯达克100定投回测报告 [$(date +%Y-%m-%d)]" && git push)

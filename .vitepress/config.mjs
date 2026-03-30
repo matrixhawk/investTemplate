@@ -68,7 +68,9 @@ export default defineConfig({
         text: '📊 05-策略框架',
         collapsed: true,
         items: [
-          { text: '08-烟蒂股策略框架', link: '/05-策略框架/08-烟蒂股策略框架' }
+          { text: '08-烟蒂股策略框架', link: '/05-策略框架/08-烟蒂股策略框架' },
+          { text: 'VIX-纳斯达克100定投策略', link: '/05-策略框架/VIX-纳斯达克100定投策略/README' },
+          { text: 'VIX策略回测报告', link: '/05-策略框架/VIX-纳斯达克100定投策略/backtest_report' }
         ]
       },
       {
