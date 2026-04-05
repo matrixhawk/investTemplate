@@ -68,7 +68,7 @@ export default defineConfig({
         ]
       },
       {
-        text: '📈 07-分析输出',
+        text: '📈 个股分析报告',
         collapsed: true,
         items: [
           { text: '🔥 监控概览（每日更新）', link: '/07-分析输出/监控概览' },
@@ -90,17 +90,10 @@ export default defineConfig({
         ]
       },
       {
-        text: '🔭 07-标的追踪',
+        text: '🔭 标的追踪',
         collapsed: true,
         items: [
           { text: '查看目录', link: '/07-标的追踪/' }
-        ]
-      },
-      {
-        text: '🤖 08-决策追踪',
-        collapsed: true,
-        items: [
-          { text: '🎯 模拟持仓', link: '/模拟持仓/持仓' }
         ]
       }
       ]
