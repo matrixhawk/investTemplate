@@ -3,9 +3,9 @@
   "version": "V1.0",
   "last_update": "2026-04-09",
   "account": {
-    "initial_capital": 100000,
+    "initial_capital": 9103.0,
     "cash": 90897.0,
-    "total_assets": 99041.52
+    "total_assets": 8144.52
   },
   "position": {
     "etf_code": "513110",
@@ -20,9 +20,9 @@
   },
   "performance": {
     "total_pnl": -958.48,
-    "total_return_pct": -0.96,
-    "daily_pnl": -1302.48,
-    "vix": 21.23,
+    "total_return_pct": -10.53,
+    "daily_pnl": 0.0,
+    "vix": 21.22,
     "date": "2026-04-09"
   },
   "schedule": {
@@ -52,6 +52,12 @@
     }
   ],
   "daily_snapshots": [
+    {
+      "date": "2026-04-09",
+      "price": 2.026,
+      "pnl": -958.48,
+      "daily_pnl": 0.0
+    },
     {
       "date": "2026-04-09",
       "price": 2.026,
