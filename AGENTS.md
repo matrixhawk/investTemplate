@@ -1433,6 +1433,40 @@ cp simulation_state.json.20260330_214921.bak simulation_state.json
 | `simulation_daily_snapshot.csv` | 每日持仓快照，用于回溯 | 脚本自动追加 |
 | `dashboard_snapshot.json` | Dashboard展示数据 | 脚本自动生成 |
 
+#### 5. 多文件数据一致性原则（V5.5.14新增）⭐⭐⭐⭐⭐
+
+**问题案例**：
+- 2026-04-09：网页显示错误成本价（0.365 vs 0.295），发现 `public/dashboard/dashboard_snapshot.json` 未同步更新
+- 根因：VitePress 网页组件从 `public/dashboard/dashboard_snapshot.json` 读取数据，而非 `08-决策追踪/dashboard_snapshot.json`
+
+**强制性要求**：
+
+修改模拟持仓数据时，**必须同时更新以下所有文件**，保持数据完全一致：
+
+```
+修改数据源
+    ├── 1️⃣ 08-决策追踪/simulation_trades.csv      (唯一真相源)
+    ├── 2️⃣ 08-决策追踪/simulation_state.json       (运行时状态)
+    ├── 3️⃣ 08-决策追踪/dashboard_snapshot.json     (决策追踪目录)
+    └── 4️⃣ public/dashboard/dashboard_snapshot.json  (VitePress网页数据源)  ⭐ 容易遗漏！
+```
+
+**更新后验证清单**：
+- [ ] `simulation_trades.csv` - 成本价、股数、现金正确
+- [ ] `simulation_state.json` - 与 trades.csv 一致
+- [ ] `08-决策追踪/dashboard_snapshot.json` - 数据已更新
+- [ ] **`public/dashboard/dashboard_snapshot.json`** - 数据已同步
+- [ ] 网页刷新后显示正确
+
+**自动化建议**：
+```python
+# 建议创建同步脚本 scripts/sync_dashboard_data.py
+# 功能：从 trades.csv 重新生成所有下游文件
+
+python scripts/sync_dashboard_data.py
+# 自动更新：state.json → dashboard_snapshot.json → public/dashboard/dashboard_snapshot.json
+```
+
 ### 常见错误及修复
 
 #### 错误1：code不一致
@@ -1475,5 +1509,5 @@ cp simulation_state.json.20260330_214921.bak simulation_state.json
 
 ---
 
-**版本**: V5.5.13 模拟组合数据硬约束版  
-**最后更新**: 2026-03-30
+**版本**: V5.5.14 模拟组合数据硬约束+多文件一致性版  
+**最后更新**: 2026-04-09
