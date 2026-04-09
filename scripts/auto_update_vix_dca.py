@@ -9,6 +9,7 @@ VIX定投策略自动更新脚本 V1.0
 import json
 import csv
 import argparse
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -78,23 +79,27 @@ def get_etf_price_from_akshare(date_str=None):
     """从akshare获取ETF价格"""
     if not AKSHARE_AVAILABLE:
         return None
-    try:
-        if date_str:
-            df = ak.fund_etf_hist_em(symbol=ETF_CODE, period="daily", 
-                                      start_date=date_str.replace('-', ''), 
-                                      end_date=date_str.replace('-', ''), adjust='qfq')
-        else:
-            # 获取最近5天数据
-            df = ak.fund_etf_hist_em(symbol=ETF_CODE, period="daily", adjust='qfq')
-        
-        if not df.empty:
-            latest = df.iloc[-1]
-            return {
-                'price': round(float(latest['收盘']), 3),
-                'date': latest['日期'] if '日期' in latest else date_str
-            }
-    except Exception as e:
-        print(f"akshare获取ETF价格失败: {e}")
+    max_retries = 3
+    for attempt in range(1, max_retries + 1):
+        try:
+            if date_str:
+                df = ak.fund_etf_hist_em(symbol=ETF_CODE, period="daily",
+                                          start_date=date_str.replace('-', ''),
+                                          end_date=date_str.replace('-', ''), adjust='qfq')
+            else:
+                # 获取最近5天数据
+                df = ak.fund_etf_hist_em(symbol=ETF_CODE, period="daily", adjust='qfq')
+            
+            if not df.empty:
+                latest = df.iloc[-1]
+                return {
+                    'price': round(float(latest['收盘']), 3),
+                    'date': latest['日期'] if '日期' in latest else date_str
+                }
+        except Exception as e:
+            print(f"akshare获取ETF价格失败 (attempt {attempt}/{max_retries}): {e}")
+            if attempt < max_retries:
+                time.sleep(attempt)
     return None
 
 
@@ -149,9 +154,39 @@ def get_etf_price(date_str=None):
     yf_result = get_etf_price_from_yfinance()
     if yf_result:
         print(f"[ETF] yfinance QQQ参考: {yf_result['price']} (涨跌: {yf_result['change_pct']*100:.2f}%)")
-        print(f"[ETF] ⚠️  注意：这是QQQ价格，不是513110的实际价格")
+        print(f"[ETF] 注意：这是QQQ价格，不是513110的实际价格")
     
     print("[ETF] 无法自动获取513110的A股价格，请手动提供 --price 参数")
+    return None
+
+
+def get_last_known_etf_price(state):
+    """Fallback: use last confirmed close from local state/snapshot."""
+    try:
+        current_price = float(state.get('position', {}).get('current_price', 0))
+        if current_price > 0:
+            return {
+                'price': round(current_price, 3),
+                'source': 'state.position.current_price',
+                'date': state.get('account', {}).get('last_update', 'unknown')
+            }
+    except Exception:
+        pass
+
+    if SNAPSHOT_FILE.exists():
+        try:
+            with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
+                rows = list(csv.reader(f))
+            if len(rows) > 1:
+                last = rows[-1]
+                return {
+                    'price': round(float(last[2]), 3),
+                    'source': 'daily_snapshot.csv',
+                    'date': last[0]
+                }
+        except Exception:
+            pass
+
     return None
 
 
@@ -181,6 +216,20 @@ def is_trading_day(date_str, last_trade_date, next_trade_date):
         return days_diff >= 13  # 约两周
     
     return True
+
+
+def get_next_trade_date(state):
+    """兼容不同state结构，解析下次定投日。"""
+    schedule = state.get('schedule', {})
+    next_trade = schedule.get('next_trade_date')
+    if next_trade:
+        return next_trade
+
+    upcoming = schedule.get('upcoming_trade_dates', [])
+    if isinstance(upcoming, list) and upcoming:
+        return upcoming[0]
+
+    return state.get('statistics', {}).get('next_trade_date')
 
 
 def get_vix_zone(vix):
@@ -299,6 +348,10 @@ def update_dashboard_data(dashboard, state, date_str, vix, price, trade_info):
     acc = state['account']
     perf = state['daily_performance']
     stats = state['statistics']
+    next_trade_date = get_next_trade_date(state)
+    days_until_next = None
+    if next_trade_date:
+        days_until_next = (datetime.strptime(next_trade_date, '%Y-%m-%d') - datetime.strptime(date_str, '%Y-%m-%d')).days
     
     dashboard['last_update'] = date_str
     dashboard['account'] = {
@@ -329,8 +382,8 @@ def update_dashboard_data(dashboard, state, date_str, vix, price, trade_info):
     dashboard['schedule'] = {
         'frequency': '每两周周二',
         'last_trade_date': stats['last_trade_date'],
-        'next_trade_date': state['schedule']['next_trade_date'],
-        'days_until_next': (datetime.strptime(state['schedule']['next_trade_date'], '%Y-%m-%d') - datetime.strptime(date_str, '%Y-%m-%d')).days
+        'next_trade_date': next_trade_date,
+        'days_until_next': days_until_next
     }
     
     # 添加交易记录
@@ -365,8 +418,8 @@ def update_markdown_template(state, date_str, vix, price):
         snapshots = snapshots[-10:]
     
     # 计算下次定投日
-    next_trade = state['schedule']['next_trade_date']
-    days_until = (datetime.strptime(next_trade, '%Y-%m-%d') - datetime.strptime(date_str, '%Y-%m-%d')).days
+    next_trade = get_next_trade_date(state)
+    days_until = (datetime.strptime(next_trade, '%Y-%m-%d') - datetime.strptime(date_str, '%Y-%m-%d')).days if next_trade else None
     
     content = f"""# VIX定投策略 - 纳指100 ETF（**{ETF_CODE}**）
 
@@ -427,7 +480,7 @@ def update_markdown_template(state, date_str, vix, price):
 | 日期 | 星期 | 状态 | 预计操作 |
 |------|------|------|----------|
 | {date_str} | {['一','二','三','四','五','六','日'][datetime.strptime(date_str, '%Y-%m-%d').weekday()]} | {'✅ 今日已更新' if date_str == datetime.now().strftime('%Y-%m-%d') else '已完成'} | 持仓更新 |
-| {next_trade} | {['一','二','三','四','五','六','日'][datetime.strptime(next_trade, '%Y-%m-%d').weekday()]} | ⏳ 等待 | 下次定投（{days_until}天后） |
+| {next_trade if next_trade else '待配置'} | {['一','二','三','四','五','六','日'][datetime.strptime(next_trade, '%Y-%m-%d').weekday()] if next_trade else '-'} | ⏳ 等待 | {f'下次定投（{days_until}天后）' if days_until is not None else '请补充next_trade_date'} |
 
 ---
 
@@ -556,6 +609,13 @@ def main():
     if state.get('account', {}).get('last_update') == date_str and not args.force:
         print(f"[跳过] {date_str} 已更新，使用 --force 强制更新")
         return 0
+
+    # 提前判断是否为定投日，供价格获取失败时决定是否允许兜底
+    is_trading = is_trading_day(
+        date_str,
+        state['statistics'].get('last_trade_date'),
+        get_next_trade_date(state)
+    )
     
     # 获取VIX数据
     if args.vix is not None:
@@ -574,8 +634,13 @@ def main():
     else:
         price = get_etf_price(date_str)
         if price is None:
-            print("错误: 无法获取ETF价格，请使用 --price 参数手动提供")
-            return 1
+            fallback = get_last_known_etf_price(state)
+            if fallback and not is_trading:
+                price = fallback['price']
+                print(f"[ETF] 自动获取失败，非定投日改用上次价格: {price} (来源: {fallback['source']}, 日期: {fallback['date']})")
+            else:
+                print("错误: 无法获取ETF价格，请使用 --price 参数手动提供")
+                return 1
     
     print()
     print(f"=== 更新数据 ===")
@@ -583,11 +648,6 @@ def main():
     print(f"VIX: {vix}")
     print(f"ETF价格: {price}")
     print()
-    
-    # 判断是否为定投日
-    is_trading = is_trading_day(date_str, 
-                                state['statistics'].get('last_trade_date'),
-                                state['schedule']['next_trade_date'])
     
     if is_trading:
         print(f"[定投日] 今天是定投日，将执行买入判断")
