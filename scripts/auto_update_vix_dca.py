@@ -232,6 +232,41 @@ def get_next_trade_date(state):
     return state.get('statistics', {}).get('next_trade_date')
 
 
+def has_initial_capital_mode(state):
+    """是否启用初始资金账户模式（默认关闭，按定投口径统计）。"""
+    mode = str(state.get('account', {}).get('capital_mode', 'dca')).lower()
+    return mode in ('fixed', 'initial_capital')
+
+
+def get_tracking_principal(state):
+    """收益率分母：有初始资金用初始资金，否则用累计投入本金。"""
+    if has_initial_capital_mode(state):
+        return float(state.get('account', {}).get('initial_capital', 0) or 0)
+
+    # 定投口径：优先使用策略启动以来累计投入（从 start_date 开始累计）
+    cumulative_buy = float(state.get('statistics', {}).get('cumulative_buy', 0) or 0)
+    if cumulative_buy > 0:
+        return cumulative_buy
+
+    # 兼容历史数据：如果旧数据缺失 cumulative_buy，再退回当前持仓成本
+    total_cost = float(state.get('position', {}).get('total_cost', 0) or 0)
+    return total_cost
+
+
+def get_total_assets_value(state, price=None):
+    """总资产：持仓市值 + 现金（若存在初始资金账户）。"""
+    pos = state.get('position', {})
+    market_value = float(pos.get('market_value', 0) or 0)
+    if price is not None:
+        market_value = float(pos.get('shares', 0) or 0) * float(price)
+
+    if has_initial_capital_mode(state):
+        cash = float(state.get('account', {}).get('cash', 0) or 0)
+        return market_value + cash
+
+    return market_value
+
+
 def get_vix_zone(vix):
     if vix >= 30: return ">=30"
     elif vix >= 25: return "25-30"
@@ -257,6 +292,7 @@ def update_state(state, config, date_str, vix, price, is_trading):
     
     pos = state['position']
     acc = state['account']
+    use_cash_account = has_initial_capital_mode(state)
     
     trade_executed = False
     trade_info = None
@@ -265,18 +301,19 @@ def update_state(state, config, date_str, vix, price, is_trading):
         buy_amount, label = get_buy_amount(vix, config)
         
         if buy_amount > 0:
-            cash_before = acc['cash']
+            cash_before = float(acc.get('cash', 0) or 0)
             fee = max(0.01, buy_amount * 0.0001)
             actual = buy_amount - fee
             shares = int(actual / price)
             total_cost = shares * price + fee
-            cash_after = cash_before - total_cost
+            cash_after = cash_before - total_cost if use_cash_account else cash_before
             
             # 更新持仓
             pos['shares'] += shares
             pos['total_cost'] += total_cost
             pos['avg_cost'] = pos['total_cost'] / pos['shares']
-            acc['cash'] = cash_after
+            if use_cash_account:
+                acc['cash'] = cash_after
             
             # 更新统计
             state['statistics']['cumulative_buy'] += buy_amount
@@ -299,11 +336,13 @@ def update_state(state, config, date_str, vix, price, is_trading):
     
     # 更新每日收益（无论是否交易）
     position_value = pos['shares'] * price
-    net_value = position_value + acc['cash']
+    net_value = get_total_assets_value(state, price=price)
     total_cost = pos['total_cost']
     unrealized = position_value - total_cost if total_cost > 0 else 0
     return_pct = (unrealized / total_cost * 100) if total_cost > 0 else 0
     daily_pnl = unrealized - prev_unrealized
+    principal = get_tracking_principal(state)
+    total_return_pct = ((net_value - principal) / principal * 100) if principal > 0 else 0
     
     # 更新持仓数据
     pos['current_price'] = price
@@ -317,7 +356,7 @@ def update_state(state, config, date_str, vix, price, is_trading):
         'vix': vix,
         'daily_pnl': round(daily_pnl, 2),
         'total_pnl': round(unrealized, 2),
-        'total_return_pct': round((net_value - 100000) / 100000 * 100, 2)
+        'total_return_pct': round(total_return_pct, 2)
     }
     
     # 更新时间
@@ -348,6 +387,9 @@ def update_dashboard_data(dashboard, state, date_str, vix, price, trade_info):
     acc = state['account']
     perf = state['daily_performance']
     stats = state['statistics']
+    principal = get_tracking_principal(state)
+    cash = float(acc.get('cash', 0) or 0)
+    total_assets = get_total_assets_value(state)
     next_trade_date = get_next_trade_date(state)
     days_until_next = None
     if next_trade_date:
@@ -355,9 +397,9 @@ def update_dashboard_data(dashboard, state, date_str, vix, price, trade_info):
     
     dashboard['last_update'] = date_str
     dashboard['account'] = {
-        'initial_capital': 100000,
-        'cash': round(acc['cash'], 2),
-        'total_assets': round(perf['total_pnl'] + 100000, 2)
+        'initial_capital': round(principal, 2),
+        'cash': round(cash, 2),
+        'total_assets': round(total_assets, 2)
     }
     dashboard['position'] = {
         'etf_code': ETF_CODE,
@@ -411,6 +453,9 @@ def update_markdown_template(state, date_str, vix, price):
     acc = state['account']
     perf = state['daily_performance']
     stats = state['statistics']
+    principal = get_tracking_principal(state)
+    cash = float(acc.get('cash', 0) or 0)
+    total_assets = get_total_assets_value(state)
     
     # 生成收益走势表格（最近10天）
     snapshots = state.get('daily_snapshots', [])
@@ -424,7 +469,7 @@ def update_markdown_template(state, date_str, vix, price):
     content = f"""# VIX定投策略 - 纳指100 ETF（**{ETF_CODE}**）
 
 > **标的代码：{ETF_CODE}** | 策略版本：V1.0 | 启动日期：2026-03-26  
-> **买卖执行：每两周周二** | **收益更新：每日** | 初始资金：100,000元
+> **买卖执行：每两周周二** | **收益更新：每日** | 投入本金：{principal:,.2f}元
 
 ---
 
@@ -437,8 +482,8 @@ def update_markdown_template(state, date_str, vix, price):
 | **最新收盘价** | {price:.2f}元 |
 | **持仓收益** | **{pos['unrealized_pnl']:+.2f}元 ({pos['return_pct']:+.2f}%)** {'✅' if pos['unrealized_pnl'] >= 0 else '⚠️'} |
 | **总收益** | **{perf['total_pnl']:+.2f}元 ({perf['total_return_pct']:+.2f}%)** |
-| **剩余现金** | {acc['cash']:,.2f}元 |
-| **总资产** | {perf['total_pnl'] + 100000:,.2f}元 |
+| **剩余现金** | {cash:,.2f}元 |
+| **总资产** | {total_assets:,.2f}元 |
 
 ---
 
@@ -454,7 +499,7 @@ def update_markdown_template(state, date_str, vix, price):
         snap_price = snap['price']
         snap_pnl = snap['pnl']
         snap_daily = snap['daily_pnl']
-        snap_return = (snap_pnl / 100000) * 100
+        snap_return = (snap_pnl / principal * 100) if principal > 0 else 0
         marker = "**" if snap_date == date_str else ""
         content += f"| {marker}{snap_date}{marker} | {marker}{snap_price:.2f}{marker} | {marker}{snap_daily:+.2f}{marker} | {marker}{snap_pnl:+.2f}{marker} | {marker}{snap_return:+.2f}%{marker} |\n"
     
@@ -535,9 +580,10 @@ def record_snapshot(date_str, vix, price, state, daily_pnl, note):
     
     with open(SNAPSHOT_FILE, 'a', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
+        cash = float(acc.get('cash', 0) or 0)
         writer.writerow([
             date_str, vix, price, pos['shares'], pos['market_value'],
-            acc['cash'], pos['market_value'] + acc['cash'], pos['total_cost'],
+            cash, get_total_assets_value(state), pos['total_cost'],
             pos['unrealized_pnl'], daily_pnl, pos['return_pct'], note
         ])
     print(f"[快照] 已记录: {date_str}")
@@ -557,7 +603,8 @@ def record_trade(trade_info, state, date_str):
                            'cash_before', 'cash_after', 'net_value', 'label'])
     
     acc = state['account']
-    net_value = state['position']['market_value'] + acc['cash']
+    cash = float(acc.get('cash', 0) or 0)
+    net_value = get_total_assets_value(state)
     
     with open(TRADES_FILE, 'a', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
@@ -565,7 +612,7 @@ def record_trade(trade_info, state, date_str):
             trade_info['date'], trade_info['vix'], get_vix_zone(trade_info['vix']),
             trade_info['action'], trade_info['amount'], trade_info['shares'],
             trade_info['price'], max(0.01, trade_info['amount'] * 0.0001),
-            trade_info['amount'], acc['cash'] + trade_info['amount'], acc['cash'],
+            trade_info['amount'], cash + trade_info['amount'], cash,
             net_value, trade_info['label']
         ])
     print(f"[交易记录] 已记录: {date_str}")
