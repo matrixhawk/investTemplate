@@ -4,7 +4,9 @@
       "WebSearch",
       "WebFetch(domain:github.com)",
       "Bash(cd \"D:\\\\project\\\\investTemplate\" && cp config/data_validation_template.yaml config/validation_test.yaml)",
-      "Bash(cd \"D:\\\\project\\\\investTemplate\" && python scripts/validate_data.py config/validation_test.yaml)"
+      "Bash(cd \"D:\\\\project\\\\investTemplate\" && python scripts/validate_data.py config/validation_test.yaml)",
+      "Bash(rm -rf ~/.claude/plugins/kimi-local)",
+      "Bash(mkdir -p ~/.claude/plugins/kimi-local/.claude-plugin ~/.claude/plugins/kimi-local/commands ~/.claude/plugins/kimi-local/skills/kimi-cli-runtime ~/.claude/plugins/kimi-local/scripts)"
     ]
   }
 }

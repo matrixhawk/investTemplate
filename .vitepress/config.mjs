@@ -58,7 +58,8 @@ export default defineConfig({
           { text: '07-决策流程与持仓管理', link: '/template/07-决策流程与持仓管理' },
           { text: '08-高级烟蒂股分析框架', link: '/template/08-高级烟蒂股分析框架' },
           { text: '09-估值修复框架', link: '/template/09-估值修复框架' },
-          { text: '10-特殊轻资产模式', link: '/template/10-特殊轻资产模式' }
+          { text: '10-特殊轻资产模式', link: '/template/10-特殊轻资产模式' },
+          { text: '11-ST套利与特殊事件策略', link: '/template/11-ST套利与特殊事件策略' }
         ]
       },
       {

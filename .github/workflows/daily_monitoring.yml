@@ -79,35 +79,36 @@ jobs:
         git commit -m "📊 更新每日监控概览 $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
         git push
         
-    - name: 创建Issue提醒（如有接近买点的标的）
-      if: steps.freshness.outputs.skip != 'true' || github.event.inputs.force_run == 'true'
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const fs = require('fs');
-          const overviewPath = '07-分析输出/监控概览.md';
-          
-          if (fs.existsSync(overviewPath)) {
-            const content = fs.readFileSync(overviewPath, 'utf8');
-            
-            // 检查是否有接近买点的标的
-            if (content.includes('## 🔥 接近买点')) {
-              // 提取接近买点的部分
-              const match = content.match(/## 🔥 接近买点[\s\S]*?(?=## |$)/);
-              if (match) {
-                // 空列表提示时不创建提醒，避免每日噪音Issue
-                if (match[0].includes('当前没有标的接近买点')) {
-                  return;
-                }
-                const title = `🚨 买入提醒 - ${new Date().toISOString().split('T')[0]}`;
-                
-                await github.rest.issues.create({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  title: title,
-                  body: match[0] + '\n\n[查看完整监控概览](../blob/main/07-分析输出/监控概览.md)',
-                  labels: ['buy-signal', 'automated', 'monitoring']
-                });
-              }
-            }
-          }
+    # 暂时停用：自动创建Issue提醒（如有接近买点的标的）
+    # - name: 创建Issue提醒（如有接近买点的标的）
+    #   if: steps.freshness.outputs.skip != 'true' || github.event.inputs.force_run == 'true'
+    #   uses: actions/github-script@v6
+    #   with:
+    #     script: |
+    #       const fs = require('fs');
+    #       const overviewPath = '07-分析输出/监控概览.md';
+    #
+    #       if (fs.existsSync(overviewPath)) {
+    #         const content = fs.readFileSync(overviewPath, 'utf8');
+    #
+    #         // 检查是否有接近买点的标的
+    #         if (content.includes('## 🔥 接近买点')) {
+    #           // 提取接近买点的部分
+    #           const match = content.match(/## 🔥 接近买点[\s\S]*?(?=## |$)/);
+    #           if (match) {
+    #             // 空列表提示时不创建提醒，避免每日噪音Issue
+    #             if (match[0].includes('当前没有标的接近买点')) {
+    #               return;
+    #             }
+    #             const title = `🚨 买入提醒 - ${new Date().toISOString().split('T')[0]}`;
+    #
+    #             await github.rest.issues.create({
+    #               owner: context.repo.owner,
+    #               repo: context.repo.repo,
+    #               title: title,
+    #               body: match[0] + '\n\n[查看完整监控概览](../blob/main/07-分析输出/监控概览.md)',
+    #               labels: ['buy-signal', 'automated', 'monitoring']
+    #             });
+    #           }
+    #         }
+    #       }

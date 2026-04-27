@@ -2,59 +2,65 @@
   "strategy": {
     "name": "VIX定投策略_纳指100",
     "version": "V1.0",
-    "start_date": "2026-03-26",
+    "start_date": "2026-03-24",
+    "note": "价格已按实际市价修正（1.9-2.0元区间）",
     "etf_code": "513110",
     "etf_name": "纳斯达克100 ETF",
     "execution_frequency": "每两周周二执行一次（买入卖出）",
+    "execution_anchor_date": "2026-03-24",
     "update_frequency": "每日更新收益"
   },
   "account": {
     "initial_capital": 100000,
     "currency": "CNY",
-    "cash": 90897.0,
-    "last_update": "2026-04-09"
+    "cash": 93994.0,
+    "last_update": "2026-04-27"
   },
   "position": {
-    "shares": 4020,
-    "avg_cost": 2.265,
-    "total_cost": 9103.0,
-    "current_price": 2.026,
-    "market_value": 8144.5199999999995,
-    "unrealized_pnl": -958.4800000000005,
-    "return_pct": -10.53
+    "shares": 3078,
+    "avg_cost": 1.95,
+    "total_cost": 6006.0,
+    "current_price": 2.133,
+    "market_value": 6565.374,
+    "unrealized_pnl": 559.3739999999998,
+    "return_pct": 9.31
   },
   "daily_performance": {
-    "date": "2026-04-09",
-    "vix": 21.23,
-    "daily_pnl": -1302.48,
-    "total_pnl": -958.48,
-    "total_return_pct": -0.96
+    "date": "2026-04-27",
+    "vix": 19.05,
+    "daily_pnl": 0.0,
+    "total_pnl": 559.37,
+    "total_return_pct": 9.42
   },
   "statistics": {
-    "cumulative_buy": 9103,
+    "cumulative_buy": 6000,
     "cumulative_sell": 0,
     "trade_count": 2,
     "buy_count": 2,
     "sell_count": 0,
+    "total_invested": 6000,
     "hold_days": 14,
     "last_trade_date": "2026-04-07",
-    "next_trade_date": "2026-04-21"
+    "next_trade_date": "2026-05-05"
   },
   "schedule": {
     "frequency": "每两周周二",
+    "anchor_date": "2026-03-24",
     "upcoming_trade_dates": [
-      "2026-04-21",
       "2026-05-05",
       "2026-05-19",
-      "2026-06-02"
-    ]
+      "2026-06-02",
+      "2026-06-16",
+      "2026-06-30"
+    ],
+    "next_trade_date": "2026-05-05"
   },
   "history": {
-    "vix_high": 31.2,
-    "vix_high_date": "2026-04-07",
-    "vix_low": 18.3,
-    "vix_low_date": "2026-04-02",
-    "max_unrealized_pnl": 344.0,
-    "max_unrealized_date": "2026-04-08"
+    "vix_high": 21.23,
+    "vix_high_date": "2026-04-13",
+    "vix_low": 17.48,
+    "vix_low_date": "2026-04-20",
+    "max_unrealized_pnl": 559.3739999999998,
+    "max_unrealized_date": "2026-04-21"
   }
 }

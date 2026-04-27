@@ -47,3 +47,6 @@ temp/
 
 # 工具快照目录
 .alma-snapshots/
+
+# 自动生成的备份文件
+*.bak

@@ -49,28 +49,29 @@ jobs:
         name: daily-report-${{ github.run_id }}
         path: 07-标的追踪/stock_data/daily_report.md
         
-    - name: 创建Issue提醒（如有可买标的）
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const fs = require('fs');
-          const reportPath = '07-标的追踪/stock_data/daily_report.md';
-          
-          if (fs.existsSync(reportPath)) {
-            const report = fs.readFileSync(reportPath, 'utf8');
-            
-            // 检查是否有买入提醒
-            if (report.includes('🔴 **可买**')) {
-              // 提取可买标的
-              const buySection = report.split('## 🔔 买入提醒')[1];
-              const title = `🚨 买入提醒 - ${new Date().toISOString().split('T')[0]}`;
-              
-              github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: title,
-                body: report,
-                labels: ['buy-signal', 'automated']
-              });
-            }
-          }
+    # 暂时停用：自动创建Issue提醒（如有可买标的）
+    # - name: 创建Issue提醒（如有可买标的）
+    #   uses: actions/github-script@v6
+    #   with:
+    #     script: |
+    #       const fs = require('fs');
+    #       const reportPath = '07-标的追踪/stock_data/daily_report.md';
+    #
+    #       if (fs.existsSync(reportPath)) {
+    #         const report = fs.readFileSync(reportPath, 'utf8');
+    #
+    #         // 检查是否有买入提醒
+    #         if (report.includes('🔴 **可买**')) {
+    #           // 提取可买标的
+    #           const buySection = report.split('## 🔔 买入提醒')[1];
+    #           const title = `🚨 买入提醒 - ${new Date().toISOString().split('T')[0]}`;
+    #
+    #           github.rest.issues.create({
+    #             owner: context.repo.owner,
+    #             repo: context.repo.repo,
+    #             title: title,
+    #             body: report,
+    #             labels: ['buy-signal', 'automated']
+    #           });
+    #         }
+    #       }

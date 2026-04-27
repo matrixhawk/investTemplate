@@ -1,92 +1,86 @@
 {
   "strategy": "VIX定投策略_纳指100",
   "version": "V1.0",
-  "last_update": "2026-04-09",
+  "last_update": "2026-04-27",
   "account": {
-    "initial_capital": 100000,
-    "cash": 90897.0,
-    "total_assets": 99041.52
+    "initial_capital": 6000.0,
+    "cash": 93994.0,
+    "total_assets": 6565.37
   },
   "position": {
     "etf_code": "513110",
     "etf_name": "纳斯达克100 ETF",
-    "shares": 4020,
-    "avg_cost": 2.265,
-    "current_price": 2.026,
-    "market_value": 8144.52,
-    "total_cost": 9103.0,
-    "unrealized_pnl": -958.48,
-    "return_pct": -10.53
+    "shares": 3078,
+    "avg_cost": 1.95,
+    "current_price": 2.133,
+    "market_value": 6565.37,
+    "total_cost": 6006.0,
+    "unrealized_pnl": 559.37,
+    "return_pct": 9.31
   },
   "performance": {
-    "total_pnl": -958.48,
-    "total_return_pct": -0.96,
-    "daily_pnl": -1302.48,
-    "vix": 21.23,
-    "date": "2026-04-09"
+    "total_pnl": 559.37,
+    "total_return_pct": 9.42,
+    "daily_pnl": 0.0,
+    "vix": 19.05,
+    "date": "2026-04-27"
   },
   "schedule": {
     "frequency": "每两周周二",
     "last_trade_date": "2026-04-07",
-    "next_trade_date": "2026-04-21",
-    "days_until_next": 12
+    "next_trade_date": "2026-05-05",
+    "days_until_next": 8
   },
   "recent_trades": [
     {
       "date": "2026-04-07",
-      "vix": 31.2,
-      "action": "BUY",
-      "amount": 6000,
-      "shares": 2625,
-      "price": 2.28,
-      "label": "加倍定投"
-    },
-    {
-      "date": "2026-03-26",
-      "vix": 22.5,
+      "vix": 19.5,
       "action": "BUY",
       "amount": 3000,
-      "shares": 1395,
-      "price": 2.15,
+      "shares": 1537,
+      "price": 1.952,
+      "label": "标准定投"
+    },
+    {
+      "date": "2026-03-24",
+      "vix": 21.0,
+      "action": "BUY",
+      "amount": 3000,
+      "shares": 1541,
+      "price": 1.947,
       "label": "标准定投"
     }
   ],
   "daily_snapshots": [
     {
-      "date": "2026-04-09",
-      "price": 2.026,
-      "pnl": -958.48,
-      "daily_pnl": -1302.48
+      "date": "2026-04-27",
+      "price": 2.133,
+      "pnl": 559.37,
+      "daily_pnl": 0.0
     },
     {
-      "date": "2026-04-08",
-      "price": 2.35,
-      "pnl": 344.0,
-      "daily_pnl": 281.4
+      "date": "2026-04-24",
+      "price": 2.133,
+      "pnl": 559.37,
+      "daily_pnl": 0.0
     },
     {
-      "date": "2026-04-07",
-      "price": 2.28,
-      "pnl": 62.6,
-      "daily_pnl": -212.65
+      "date": "2026-04-23",
+      "price": 2.133,
+      "pnl": 559.37,
+      "daily_pnl": 0.0
     },
     {
-      "date": "2026-04-06",
-      "price": 2.35,
-      "pnl": 275.25,
-      "daily_pnl": 41.85
+      "date": "2026-04-22",
+      "price": 2.133,
+      "pnl": 559.37,
+      "daily_pnl": 0.0
     },
     {
-      "date": "2026-04-03",
-      "price": 2.32,
-      "pnl": 233.4,
-      "daily_pnl": 27.9
-    },
-    {
-      "date": "2026-04-02",
-      "price": 2.3,
-      "pnl": 205.5,
-      "daily_pnl": 27.9
+      "date": "2026-04-21",
+      "price": 2.133,
+      "pnl": 559.37,
+      "daily_pnl": 9.23
     }
   ]
 }

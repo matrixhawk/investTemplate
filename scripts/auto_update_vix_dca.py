@@ -207,9 +207,12 @@ def is_trading_day(date_str, last_trade_date, next_trade_date):
     # 必须是周二
     if dt.weekday() != 1:  # 1 = Tuesday
         return False
+
+    # 若已配置next_trade_date，则仅在该日执行交易
+    if next_trade_date:
+        return date_str == next_trade_date
     
-    # 检查是否在预定的交易日列表中
-    # 简单逻辑：距离上次交易日14天
+    # 回退逻辑：距离上次交易日约两周
     if last_trade_date:
         last = datetime.strptime(last_trade_date, '%Y-%m-%d')
         days_diff = (dt - last).days
@@ -218,11 +221,58 @@ def is_trading_day(date_str, last_trade_date, next_trade_date):
     return True
 
 
-def get_next_trade_date(state):
-    """兼容不同state结构，解析下次定投日。"""
+def build_upcoming_trade_dates(start_date_str, count=5):
+    """从给定日期开始生成未来双周二日期列表。"""
+    start_dt = datetime.strptime(start_date_str, '%Y-%m-%d')
+    dates = []
+    for i in range(count):
+        dates.append((start_dt + timedelta(days=14 * i)).strftime('%Y-%m-%d'))
+    return dates
+
+
+def ensure_trade_schedule(state, ref_date_str):
+    """确保state中的下次定投日期与日历列表完整且一致。"""
+    stats = state.setdefault('statistics', {})
+    schedule = state.setdefault('schedule', {})
+
+    next_trade = get_next_trade_date(state)
+    if not next_trade:
+        ref_dt = datetime.strptime(ref_date_str, '%Y-%m-%d')
+        days = (1 - ref_dt.weekday()) % 7
+        if days == 0:
+            days = 14
+        next_trade = (ref_dt + timedelta(days=days)).strftime('%Y-%m-%d')
+
+    stats['next_trade_date'] = next_trade
+    schedule['next_trade_date'] = next_trade
+    schedule['upcoming_trade_dates'] = build_upcoming_trade_dates(next_trade, count=5)
+
+
+def roll_next_trade_schedule(state, executed_trade_date):
+    """定投日成交后，滚动到下一次双周二。"""
+    next_trade = (datetime.strptime(executed_trade_date, '%Y-%m-%d') + timedelta(days=14)).strftime('%Y-%m-%d')
+    state.setdefault('statistics', {})['next_trade_date'] = next_trade
+    schedule = state.setdefault('schedule', {})
+    schedule['next_trade_date'] = next_trade
+    schedule['upcoming_trade_dates'] = build_upcoming_trade_dates(next_trade, count=5)
+
+
+def get_next_trade_date(state, ref_date_str=None):
+    """兼容不同state结构，解析下次定投日；若已过期则自动滚动。"""
     schedule = state.get('schedule', {})
     next_trade = schedule.get('next_trade_date')
+
+    today = ref_date_str or datetime.now().strftime('%Y-%m-%d')
+
     if next_trade:
+        if next_trade < today:
+            # 已过期，从过期日期开始不断加14天直到超过今天
+            dt = datetime.strptime(next_trade, '%Y-%m-%d')
+            while dt.strftime('%Y-%m-%d') <= today:
+                dt += timedelta(days=14)
+            next_trade = dt.strftime('%Y-%m-%d')
+            schedule['next_trade_date'] = next_trade
+            schedule['upcoming_trade_dates'] = build_upcoming_trade_dates(next_trade, count=5)
         return next_trade
 
     upcoming = schedule.get('upcoming_trade_dates', [])
@@ -316,9 +366,12 @@ def update_state(state, config, date_str, vix, price, is_trading):
                 acc['cash'] = cash_after
             
             # 更新统计
-            state['statistics']['cumulative_buy'] += buy_amount
-            state['statistics']['buy_count'] += 1
+            state['statistics']['cumulative_buy'] = float(state['statistics'].get('cumulative_buy', 0) or 0) + buy_amount
+            state['statistics']['buy_count'] = int(state['statistics'].get('buy_count', 0) or 0) + 1
+            state['statistics']['trade_count'] = int(state['statistics'].get('trade_count', 0) or 0) + 1
+            state['statistics']['total_invested'] = float(state['statistics'].get('total_invested', 0) or 0) + buy_amount
             state['statistics']['last_trade_date'] = date_str
+            roll_next_trade_schedule(state, date_str)
             
             trade_executed = True
             trade_info = {
@@ -333,6 +386,8 @@ def update_state(state, config, date_str, vix, price, is_trading):
             print(f"[交易] {label}: 买入{shares}份 @ {price}元，金额{buy_amount}元")
         else:
             print(f"[交易] VIX={vix} < 20，暂停定投")
+            # 即使暂停定投，也要滚动下次定投日，否则日历会卡住
+            roll_next_trade_schedule(state, date_str)
     
     # 更新每日收益（无论是否交易）
     position_value = pos['shares'] * price
@@ -387,9 +442,11 @@ def update_dashboard_data(dashboard, state, date_str, vix, price, trade_info):
     acc = state['account']
     perf = state['daily_performance']
     stats = state['statistics']
+    schedule = state.get('schedule', {})
     principal = get_tracking_principal(state)
     cash = float(acc.get('cash', 0) or 0)
     total_assets = get_total_assets_value(state)
+    anchor_date = schedule.get('anchor_date', '未设置')
     next_trade_date = get_next_trade_date(state)
     days_until_next = None
     if next_trade_date:
@@ -431,16 +488,18 @@ def update_dashboard_data(dashboard, state, date_str, vix, price, trade_info):
     # 添加交易记录
     if trade_info:
         dashboard['recent_trades'].insert(0, trade_info)
-        dashboard['recent_trades'] = dashboard['recent_trades'][:10]  # 保留最近10条
+        dashboard['recent_trades'] = dashboard['recent_trades'][:5]  # 保留最近5条
     
-    # 添加每日快照
-    dashboard['daily_snapshots'].insert(0, {
+    # 添加每日快照（去重：若当天已存在则替换）
+    snaps = dashboard.get('daily_snapshots', [])
+    snaps = [s for s in snaps if s.get('date') != date_str]
+    snaps.insert(0, {
         'date': date_str,
         'price': price,
         'pnl': perf['total_pnl'],
         'daily_pnl': perf['daily_pnl']
     })
-    dashboard['daily_snapshots'] = dashboard['daily_snapshots'][:30]  # 保留最近30天
+    dashboard['daily_snapshots'] = snaps[:5]  # 保留最近5天
     
     return dashboard
 
@@ -457,19 +516,26 @@ def update_markdown_template(state, date_str, vix, price):
     cash = float(acc.get('cash', 0) or 0)
     total_assets = get_total_assets_value(state)
     
-    # 生成收益走势表格（最近10天）
-    snapshots = state.get('daily_snapshots', [])
-    if len(snapshots) > 10:
-        snapshots = snapshots[-10:]
+    # 生成收益走势表格（最近5天）
+    dashboard = load_json(DASHBOARD_FILE)
+    snapshots = dashboard.get('daily_snapshots', [])
+    if len(snapshots) > 5:
+        snapshots = snapshots[:5]
     
+    schedule = state.get('schedule', {})
     # 计算下次定投日
     next_trade = get_next_trade_date(state)
     days_until = (datetime.strptime(next_trade, '%Y-%m-%d') - datetime.strptime(date_str, '%Y-%m-%d')).days if next_trade else None
+    upcoming_trades = schedule.get('upcoming_trade_dates', [])
+    if not upcoming_trades and next_trade:
+        upcoming_trades = [next_trade]
+    anchor_date = schedule.get('anchor_date', '未设置')
     
     content = f"""# VIX定投策略 - 纳指100 ETF（**{ETF_CODE}**）
 
-> **标的代码：{ETF_CODE}** | 策略版本：V1.0 | 启动日期：2026-03-26  
+> **标的代码：{ETF_CODE}** | 策略版本：V1.0 | 启动日期：2026-03-24  
 > **买卖执行：每两周周二** | **收益更新：每日** | 投入本金：{principal:,.2f}元
+> **双周锚点：{anchor_date}（每双周周二定投）**
 
 ---
 
@@ -487,7 +553,7 @@ def update_markdown_template(state, date_str, vix, price):
 
 ---
 
-## 收益走势（最近10天）
+## 收益走势（最近5天）
 
 | 日期 | 收盘价 | 当日盈亏 | 累计盈亏 | 收益率 |
 |------|--------|----------|----------|--------|
@@ -524,8 +590,19 @@ def update_markdown_template(state, date_str, vix, price):
 
 | 日期 | 星期 | 状态 | 预计操作 |
 |------|------|------|----------|
-| {date_str} | {['一','二','三','四','五','六','日'][datetime.strptime(date_str, '%Y-%m-%d').weekday()]} | {'✅ 今日已更新' if date_str == datetime.now().strftime('%Y-%m-%d') else '已完成'} | 持仓更新 |
-| {next_trade if next_trade else '待配置'} | {['一','二','三','四','五','六','日'][datetime.strptime(next_trade, '%Y-%m-%d').weekday()] if next_trade else '-'} | ⏳ 等待 | {f'下次定投（{days_until}天后）' if days_until is not None else '请补充next_trade_date'} |
+"""
+
+    for trade_date in upcoming_trades[:5]:
+        week = ['一', '二', '三', '四', '五', '六', '日'][datetime.strptime(trade_date, '%Y-%m-%d').weekday()]
+        if trade_date == next_trade:
+            status = "⏳ 等待"
+            action = f"下次定投（{days_until}天后）" if days_until is not None else "待配置"
+        else:
+            status = "📅 计划中"
+            action = "双周定投"
+        content += f"| {trade_date} | {week} | {status} | {action} |\n"
+
+    content += f"""
 
 ---
 
@@ -651,6 +728,7 @@ def main():
     config = load_json(CONFIG_FILE)
     state = load_json(STATE_FILE)
     dashboard = load_json(DASHBOARD_FILE)
+    ensure_trade_schedule(state, date_str)
     
     # 检查是否已更新
     if state.get('account', {}).get('last_update') == date_str and not args.force:
