@@ -417,23 +417,20 @@ def check_extreme_risk_control(vix, state, config):
     return False, f"极端风控: VIX≥{trigger_vix}但未大于均值{mean_vix:.2f}，不触发", None
 
 
-def check_sell_rules(vix, state, config):
+def check_sell_rules(vix, last_vix, state, config):
     """卖出规则：必须连续2个双周周二收盘VIX均满足区间，才执行减仓。
     返回: (sell_ratio_to_execute, label, message)
     sell_ratio_to_execute 是本次需要**新增**的减仓比例（不是累计目标）。
+    last_vix: 上期双周周二的收盘VIX（由调用方提供，确保不含当期）。
     """
     sell_cfg = config.get('sell_rules', {})
     if not sell_cfg:
         return 0.0, None, ""
 
-    vix_log = state.get('strategy_state', {}).get('biweekly_vix_log', [])
-    if len(vix_log) < 1:
+    if last_vix is None:
         return 0.0, None, ""
 
-    last_entry = vix_log[-1]
-    last_vix = last_entry['vix']
-
-    # 检查连续两期是否满足条件（上期 & 本期）
+    # 检查连续两期是否满足（上期 & 本期）
     tiers = sell_cfg.get('tiers', [])
     max_reduction = sell_cfg.get('max_total_reduction', 0.40)
 
@@ -463,7 +460,13 @@ def check_sell_rules(vix, state, config):
         if additional <= 0:
             return 0.0, matched_label, f"{matched_label}: 已达最大减仓上限{max_reduction*100:.0f}%，无法继续减仓"
 
-    msg = f"{matched_label}: 连续2期VIX<{tiers[-1]['vix_max'] if matched_label=='大幅减仓' else (tiers[1]['vix_max'] if matched_label=='中度减仓' else tiers[0]['vix_max'])}，新增减仓{additional*100:.1f}%（累计目标{target_ratio*100:.0f}%）"
+    # 根据 matched_label 找到对应的 vix_max 用于消息
+    vix_max_for_msg = None
+    for tier in tiers:
+        if tier['label'] == matched_label:
+            vix_max_for_msg = tier['vix_max']
+            break
+    msg = f"{matched_label}: 连续2期VIX<{vix_max_for_msg}，新增减仓{additional*100:.1f}%（累计目标{target_ratio*100:.0f}%）"
     return additional, matched_label, msg
 
 
