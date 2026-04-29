@@ -82,5 +82,15 @@
       "pnl": 559.37,
       "daily_pnl": 9.23
     }
-  ]
+  ],
+  "strategy_version": "V2.0",
+  "strategy_state": {
+    "cumulative_sell_ratio": 0.0,
+    "reduction_pool": {
+      "total_cash": 0.0,
+      "remaining_cash": 0.0
+    },
+    "reflow_status": "none",
+    "extreme_risk_active": false
+  }
 }
