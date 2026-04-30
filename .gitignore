@@ -48,5 +48,17 @@ temp/
 # 工具快照目录
 .alma-snapshots/
 
+# AI/Agent 本地目录（不应提交）
+.agents/
+.claude/
+.codebuddy/
+.qoder/
+.qwen/
+.trae/
+.windsurf/
+
+# 本地技能/工具锁文件
+skills-lock.json
+
 # 自动生成的备份文件
 *.bak
