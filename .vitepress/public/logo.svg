@@ -1,0 +1,54 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EEF3FF"/>
+      <stop offset="1" stop-color="#F8FAFF"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="160" y1="180" x2="620" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2F56D6"/>
+      <stop offset="1" stop-color="#3E77F6"/>
+    </linearGradient>
+    <linearGradient id="card" x1="760" y1="220" x2="1060" y2="620" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F0F5FF"/>
+    </linearGradient>
+    <filter id="shadow" x="700" y="160" width="420" height="520" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#2F56D6" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="900" fill="url(#bg)"/>
+
+  <circle cx="1010" cy="120" r="140" fill="#DDE7FF" fill-opacity="0.6"/>
+  <circle cx="140" cy="770" r="170" fill="#E7EEFF" fill-opacity="0.7"/>
+
+  <text x="120" y="220" fill="url(#brand)" font-size="88" font-weight="800" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">投资分析模板</text>
+  <text x="120" y="330" fill="#2B2F3A" font-size="84" font-weight="800" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">系统化价值投资框架</text>
+
+  <text x="120" y="410" fill="#5A6478" font-size="40" font-weight="500" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">港股 / A股个股研究 · 数据驱动 · 风险优先</text>
+
+  <g filter="url(#shadow)">
+    <rect x="740" y="200" rx="28" ry="28" width="340" height="440" fill="url(#card)"/>
+  </g>
+
+  <rect x="790" y="500" width="36" height="90" rx="8" fill="#8FB1FF"/>
+  <rect x="846" y="450" width="36" height="140" rx="8" fill="#6F94F6"/>
+  <rect x="902" y="390" width="36" height="200" rx="8" fill="#4F79EA"/>
+  <rect x="958" y="330" width="36" height="260" rx="8" fill="#2F56D6"/>
+
+  <path d="M790 360C828 338 866 338 902 352C938 366 972 344 1002 306" stroke="#2F56D6" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="790" cy="360" r="8" fill="#2F56D6"/>
+  <circle cx="902" cy="352" r="8" fill="#2F56D6"/>
+  <circle cx="1002" cy="306" r="8" fill="#2F56D6"/>
+
+  <rect x="120" y="500" width="210" height="62" rx="31" fill="#4C6EDB"/>
+  <text x="160" y="542" fill="#FFFFFF" font-size="34" font-weight="700" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">价值发现</text>
+
+  <rect x="350" y="500" width="210" height="62" rx="31" fill="#587AE6"/>
+  <text x="390" y="542" fill="#FFFFFF" font-size="34" font-weight="700" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">风险控制</text>
+
+  <rect x="580" y="500" width="210" height="62" rx="31" fill="#6A88EA"/>
+  <text x="620" y="542" fill="#FFFFFF" font-size="34" font-weight="700" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">动态估值</text>
+
+  <text x="120" y="640" fill="#6A7387" font-size="30" font-weight="500" font-family="'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif">防御第一 · 普通人假设 · 分散持仓 · 风险记忆</text>
+</svg>
