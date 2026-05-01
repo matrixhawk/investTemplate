@@ -2,16 +2,16 @@
   "meta": {
     "template_version": "V5.5.12",
     "engine_version": "V3.1",
-    "generated_at": "2026-04-30 10:23:31",
+    "generated_at": "2026-05-01 10:03:30",
     "latest_trade_date": "2026-04-30"
   },
   "portfolio": {
     "initial_capital": 500000.0,
     "cash": 109160.0,
-    "market_value": 380010.0,
-    "net_value": 489170.0,
-    "total_return_pct": -2.166,
-    "position_ratio_pct": 76.002,
+    "market_value": 376589.99,
+    "net_value": 485749.99,
+    "total_return_pct": -2.85,
+    "position_ratio_pct": 75.318,
     "positions": [
       {
         "name": "天津发展",
@@ -24,7 +24,7 @@
         "market_value": 93200.0,
         "unrealized": -8800.0,
         "sell_trigger": 4.5,
-        "weight_pct": 19.0527,
+        "weight_pct": 19.1868,
         "status": "实时"
       },
       {
@@ -33,13 +33,13 @@
         "ticker": "1522.HK",
         "shares": 342000,
         "avg_cost": 0.295,
-        "close": 0.305,
+        "close": 0.295,
         "change_pct": 0.0,
-        "market_value": 104310.0,
-        "unrealized": 3420.0,
+        "market_value": 100890.0,
+        "unrealized": 0.0,
         "sell_trigger": 0.6,
-        "weight_pct": 21.3239,
-        "status": "实时"
+        "weight_pct": 20.7699,
+        "status": "占位"
       },
       {
         "name": "华润医药",
@@ -52,7 +52,7 @@
         "market_value": 78750.0,
         "unrealized": -1200.0,
         "sell_trigger": 9.0,
-        "weight_pct": 16.0987,
+        "weight_pct": 16.212,
         "status": "实时"
       },
       {
@@ -66,7 +66,7 @@
         "market_value": 103750.0,
         "unrealized": -4250.0,
         "sell_trigger": 1.0,
-        "weight_pct": 21.2094,
+        "weight_pct": 21.3587,
         "status": "实时"
       }
     ]
