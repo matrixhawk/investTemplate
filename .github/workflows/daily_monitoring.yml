@@ -106,7 +106,7 @@ jobs:
     #               owner: context.repo.owner,
     #               repo: context.repo.repo,
     #               title: title,
-    #               body: match[0] + '\n\n[查看完整监控概览](../blob/main/07-分析输出/监控概览.md)',
+    #               body: match[0] + '\n\n[查看完整监控概览](../blob/main/analysis-reports/监控概览.md)',
     #               labels: ['buy-signal', 'automated', 'monitoring']
     #             });
     #           }

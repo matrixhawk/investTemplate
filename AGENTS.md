@@ -25,10 +25,10 @@
 
 | 文件 | 用途 | 操作 |
 |------|------|------|
-| `个股分析标准模版.md` | 🔥 **分析框架入口** | 生成报告前必读 |
+| `analysis-template.md` | 🔥 **分析框架入口** | 生成报告前必读 |
 | `template/*.md` | 分章节详细模板 | 按需查阅 |
-| `07-分析输出/` | 个股分析报告归档 | 新报告保存位置 |
-| `08-决策追踪/` | 决策记录与模拟组合 | 数据存储位置 |
+| `analysis-reports/` | 个股分析报告归档 | 新报告保存位置 |
+| `decision-tracking/` | 决策记录与模拟组合 | 数据存储位置 |
 
 ---
 
@@ -38,7 +38,7 @@
 
 ```
 步骤:
-1. 读取 个股分析标准模版.md 获取最新框架
+1. 读取 analysis-template.md 获取最新框架
 2. 使用 S级数据源（年报原文）获取核心财务数据
 3. 保存到 07-分析输出/{公司}_{代码}_投资分析报告.md
 4. 更新 .vitepress/config.mjs 侧边栏
@@ -98,7 +98,7 @@ grep -q "recent_actions" public/dashboard/dashboard_snapshot.json && echo "OK" |
 - [ ] 网页展示页面数据一致
 - [ ] public目录已同步
 
-详细规范见：[docs/agents/06-模拟组合管理.md](./docs/agents/06-模拟组合管理.md)
+详细规范见：[docs/agents/06-portfolio-management.md](./docs/agents/06-portfolio-management.md)
 
 ---
 
@@ -106,12 +106,12 @@ grep -q "recent_actions" public/dashboard/dashboard_snapshot.json && echo "OK" |
 
 | 文档 | 内容 | 必读场景 |
 |------|------|----------|
-| [01-项目概述](./docs/agents/01-项目概述.md) | 投资理论、核心概念 | 首次参与项目 |
-| [02-开发规范](./docs/agents/02-开发规范.md) | 版本管理、文件命名 | 日常开发 |
-| [03-代码规范](./docs/agents/03-代码规范.md) | Python/YAML规范 | 编写脚本 |
-| [04-投资理论参考](./docs/agents/04-投资理论参考.md) | 龟龟理论、估值标准 | 分析报告 |
-| [05-数据质量控制](./docs/agents/05-数据质量控制.md) | 数据核查清单 | 生成报告前 |
-| [06-模拟组合管理](./docs/agents/06-模拟组合管理.md) | 数据硬约束、一致性 | 修改持仓数据 |
+| [01-项目概述](./docs/agents/01-project-overview.md) | 投资理论、核心概念 | 首次参与项目 |
+| [02-开发规范](./docs/agents/02-dev-guidelines.md) | 版本管理、文件命名 | 日常开发 |
+| [03-代码规范](./docs/agents/03-coding-standards.md) | Python/YAML规范 | 编写脚本 |
+| [04-投资理论参考](./docs/agents/04-investment-theory.md) | 龟龟理论、估值标准 | 分析报告 |
+| [05-数据质量控制](./docs/agents/05-data-quality.md) | 数据核查清单 | 生成报告前 |
+| [06-模拟组合管理](./docs/agents/06-portfolio-management.md) | 数据硬约束、一致性 | 修改持仓数据 |
 
 ---
 

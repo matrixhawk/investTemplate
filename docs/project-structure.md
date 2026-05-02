@@ -5,7 +5,7 @@
 ```
 D:\project\investTemplate\
 │
-├── 个股分析标准模版.md          # 🔥 核心文件：V5.5.6 当前版本
+├── analysis-template.md          # 🔥 核心文件：V5.5.6 当前版本
 ├── README.md                     # 项目入口和使用说明
 ├── CHANGELOG.md                  # 版本更新日志
 ├── AGENTS.md                     # AI Agent 配置（Skill 说明）
@@ -43,16 +43,16 @@ D:\project\investTemplate\
 
 | 需求 | 文件路径 |
 |------|---------|
-| **进行股票分析** | `个股分析标准模版.md` |
+| **进行股票分析** | `analysis-template.md` |
 | **查看版本历史** | `CHANGELOG.md` |
 | **安装 AI Skill** | `.agents/skills/invest-analysis-assistant/SKILL.md` |
-| **查看旧版本** | `归档版本/` 目录 |
+| **查看旧版本** | `archived-versions/` 目录 |
 
 ---
 
 ## 文件命名规范
 
-- **当前版本**：`个股分析标准模版.md`（始终是最新版）
+- **当前版本**：`analysis-template.md`（始终是最新版）
 - **历史版本**：`个股分析标准模版_V{版本号}_{版本名称}.md`
 - **提交记录**：`提交记录_V{版本号}.md`
 
@@ -62,7 +62,7 @@ D:\project\investTemplate\
 
 - **当前版本**：V5.5.6 实战机制深化版
 - **版本演进**：V5.5.4 → V5.5.5(FCF规范化) → V5.5.6(实战机制深化)
-- **归档位置**：`归档版本/` 目录下
+- **归档位置**：`archived-versions/` 目录下
 
 ---
 

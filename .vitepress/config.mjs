@@ -12,24 +12,24 @@ export default defineConfig({
     // 导航栏
     nav: [
       { text: '首页', link: '/' },
-      { text: '🎯 模拟持仓', link: '/模拟持仓/持仓' },
-      { text: '📈 VIX定投', link: '/模拟持仓/VIX定投策略' },
-      { text: '分析模板', link: '/个股分析标准模版' },
+      { text: '🎯 模拟持仓', link: '/portfolio/holdings' },
+      { text: '📈 VIX定投', link: '/portfolio/vix-dca-strategy' },
+      { text: '分析模板', link: '/analysis-template' },
       { text: '版本日志', link: '/docs/CHANGELOG' }
     ],
     
     // 侧边栏
     sidebar: {
-      '/模拟持仓/': [
+      '/portfolio/': [
         {
           text: '🎯 模拟持仓',
           collapsed: false,
           items: [
-            { text: '总览', link: '/模拟持仓/' },
-            { text: '持仓', link: '/模拟持仓/持仓' },
-            { text: '今日操作', link: '/模拟持仓/今日操作' },
-            { text: '决策记录', link: '/模拟持仓/决策记录' },
-            { text: '📈 VIX定投策略', link: '/模拟持仓/VIX定投策略' }
+            { text: '总览', link: '/portfolio/' },
+            { text: '持仓', link: '/portfolio/holdings' },
+            { text: '今日操作', link: '/portfolio/daily-operations' },
+            { text: '决策记录', link: '/portfolio/decision-log' },
+            { text: '📈 VIX定投策略', link: '/portfolio/vix-dca-strategy' }
           ]
         }
       ],
@@ -38,10 +38,10 @@ export default defineConfig({
         text: '📋 核心文档',
         collapsed: false,
         items: [
-          { text: '个股分析标准模版', link: '/个股分析标准模版' },
-          { text: '🎯 模拟持仓（实时）', link: '/模拟持仓/持仓' },
+          { text: '个股分析标准模版', link: '/analysis-template' },
+          { text: '🎯 模拟持仓（实时）', link: '/portfolio/holdings' },
           { text: '项目介绍', link: '/README' },
-          { text: '项目结构说明', link: '/docs/项目结构说明' },
+          { text: '项目结构说明', link: '/docs/project-structure' },
           { text: '更新日志', link: '/docs/CHANGELOG' }
         ]
       },
@@ -67,29 +67,29 @@ export default defineConfig({
         collapsed: true,
         items: [
           { text: '更新日志', link: '/docs/CHANGELOG' },
-          { text: '项目结构说明', link: '/docs/项目结构说明' }
+          { text: '项目结构说明', link: '/docs/project-structure' }
         ]
       },
       {
         text: '📈 个股分析报告',
         collapsed: true,
         items: [
-          { text: '🔥 监控概览（每日更新）', link: '/07-分析输出/监控概览' },
-          { text: '保利物业_06049_投资分析报告', link: '/07-分析输出/保利物业_06049_投资分析报告' },
-          { text: '天津发展_00882_投资分析报告', link: '/07-分析输出/天津发展_00882_投资分析报告' },
-          { text: '中国民航信息网络_00696_投资分析报告', link: '/07-分析输出/中国民航信息网络_00696_投资分析报告' },
-          { text: '金融街物业_01502_投资分析报告', link: '/07-分析输出/金融街物业_01502_投资分析报告' },
-          { text: '中海物业_02669_投资分析报告', link: '/07-分析输出/中海物业_02669_投资分析报告' },
-          { text: '汇贤产业信托_87001_投资分析报告', link: '/07-分析输出/汇贤产业信托_87001_投资分析报告' },
-          { text: '蒙牛乳业_02319_投资分析报告', link: '/07-分析输出/蒙牛乳业_02319_投资分析报告' },
-          { text: '海底捞_06862_投资分析报告', link: '/07-分析输出/海底捞_06862_投资分析报告' },
-          { text: '京投交通科技_01522_投资分析报告', link: '/07-分析输出/京投交通科技_01522_投资分析报告' },
-          { text: '绿城服务_02869_投资分析报告', link: '/07-分析输出/绿城服务_02869_投资分析报告' },
-          { text: '同仁堂国药_03613_投资分析报告', link: '/07-分析输出/同仁堂国药_03613_投资分析报告' },
-          { text: '牧原股份_002714_投资分析报告', link: '/07-分析输出/牧原股份_002714_投资分析报告' },
-          { text: '分众传媒_002027_投资分析报告', link: '/07-分析输出/分众传媒_002027_投资分析报告' },
-          { text: '青岛啤酒_600600_投资分析报告', link: '/07-分析输出/青岛啤酒_600600_投资分析报告' },
-          { text: '华润医药_03320_投资分析报告', link: '/07-分析输出/华润医药_03320_投资分析报告' }
+          { text: '🔥 监控概览（每日更新）', link: '/analysis-reports/监控概览' },
+          { text: '保利物业_06049_投资分析报告', link: '/analysis-reports/保利物业_06049_投资分析报告' },
+          { text: '天津发展_00882_投资分析报告', link: '/analysis-reports/天津发展_00882_投资分析报告' },
+          { text: '中国民航信息网络_00696_投资分析报告', link: '/analysis-reports/中国民航信息网络_00696_投资分析报告' },
+          { text: '金融街物业_01502_投资分析报告', link: '/analysis-reports/金融街物业_01502_投资分析报告' },
+          { text: '中海物业_02669_投资分析报告', link: '/analysis-reports/中海物业_02669_投资分析报告' },
+          { text: '汇贤产业信托_87001_投资分析报告', link: '/analysis-reports/汇贤产业信托_87001_投资分析报告' },
+          { text: '蒙牛乳业_02319_投资分析报告', link: '/analysis-reports/蒙牛乳业_02319_投资分析报告' },
+          { text: '海底捞_06862_投资分析报告', link: '/analysis-reports/海底捞_06862_投资分析报告' },
+          { text: '京投交通科技_01522_投资分析报告', link: '/analysis-reports/京投交通科技_01522_投资分析报告' },
+          { text: '绿城服务_02869_投资分析报告', link: '/analysis-reports/绿城服务_02869_投资分析报告' },
+          { text: '同仁堂国药_03613_投资分析报告', link: '/analysis-reports/同仁堂国药_03613_投资分析报告' },
+          { text: '牧原股份_002714_投资分析报告', link: '/analysis-reports/牧原股份_002714_投资分析报告' },
+          { text: '分众传媒_002027_投资分析报告', link: '/analysis-reports/分众传媒_002027_投资分析报告' },
+          { text: '青岛啤酒_600600_投资分析报告', link: '/analysis-reports/青岛啤酒_600600_投资分析报告' },
+          { text: '华润医药_03320_投资分析报告', link: '/analysis-reports/华润医药_03320_投资分析报告' }
         ]
       }
       ]
