@@ -3,7 +3,7 @@ name: 同步追踪代码清单
 on:
   push:
     paths:
-      - "07-分析输出/*_投资分析报告.md"
+      - "analysis-reports/*_投资分析报告.md"
       - "scripts/sync_tracked_codes.py"
       - ".github/workflows/sync_tracked_codes.yml"
   workflow_dispatch:

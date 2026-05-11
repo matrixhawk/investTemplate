@@ -56,7 +56,7 @@ jobs:
       id: freshness
       run: |
         TODAY_CN=$(date +'%Y-%m-%d')
-        STATE_FILE="08-决策追踪/vix_dca_strategy/state.json"
+        STATE_FILE="decision-tracking/vix_dca_strategy/state.json"
         
         # 获取最后更新日期
         LAST_UPDATE=$(jq -r '.account.last_update // empty' "$STATE_FILE" 2>/dev/null || echo "")
@@ -110,7 +110,7 @@ jobs:
       if: steps.freshness.outputs.skip != 'true' || github.event.inputs.force == 'true'
       run: |
         TODAY_CN=$(date +'%Y-%m-%d')
-        STATE_FILE="08-决策追踪/vix_dca_strategy/state.json"
+        STATE_FILE="decision-tracking/vix_dca_strategy/state.json"
         LAST_UPDATE=$(jq -r '.account.last_update // empty' "$STATE_FILE" 2>/dev/null || echo "")
         
         if [ "$LAST_UPDATE" = "$TODAY_CN" ]; then
@@ -131,9 +131,9 @@ jobs:
         git config --local user.name "GitHub Action"
         
         # 添加所有相关文件
-        git add -A "08-决策追踪/vix_dca_strategy/"
+        git add -A "decision-tracking/vix_dca_strategy/"
         git add -A "public/vix_strategy/"
-        git add -A "模拟持仓/VIX定投策略.md"
+        git add -A "portfolio/vix-dca-strategy.md"
         
         # 提交
         TODAY_CN=$(date +'%Y-%m-%d')

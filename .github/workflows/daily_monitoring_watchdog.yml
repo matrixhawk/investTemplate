@@ -27,7 +27,7 @@ jobs:
       id: freshness
       run: |
         TODAY_CN=$(TZ=Asia/Shanghai date +'%Y-%m-%d')
-        OVERVIEW_FILE="07-分析输出/监控概览.md"
+        OVERVIEW_FILE="analysis-reports/监控概览.md"
         if [ -f "$OVERVIEW_FILE" ] && grep -q "更新时间.*${TODAY_CN}" "$OVERVIEW_FILE"; then
           echo "stale=false" >> "$GITHUB_OUTPUT"
           echo "[INFO] 今日（${TODAY_CN}）监控概览已更新，无需补跑。"

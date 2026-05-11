@@ -38,7 +38,7 @@ jobs:
       id: freshness
       run: |
         TODAY_CN=$(TZ=Asia/Shanghai date +'%Y-%m-%d')
-        OVERVIEW_FILE="07-分析输出/监控概览.md"
+        OVERVIEW_FILE="analysis-reports/监控概览.md"
         if [ -f "$OVERVIEW_FILE" ] && grep -q "更新时间.*${TODAY_CN}" "$OVERVIEW_FILE"; then
           echo "skip=true" >> "$GITHUB_OUTPUT"
           echo "[INFO] 今日（${TODAY_CN}）监控概览已存在，跳过重复执行。"
@@ -75,7 +75,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         # 使用目录级 add，避免单文件缺失导致 pathspec 报错
-        git add -A "07-分析输出/监控概览.md" "08-决策追踪/" "public/dashboard/"
+        git add -A "analysis-reports/监控概览.md" "decision-tracking/" "public/dashboard/"
         git commit -m "📊 更新每日监控概览 $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
         git push
         
@@ -86,7 +86,7 @@ jobs:
     #   with:
     #     script: |
     #       const fs = require('fs');
-    #       const overviewPath = '07-分析输出/监控概览.md';
+    #       const overviewPath = 'analysis-reports/监控概览.md';
     #
     #       if (fs.existsSync(overviewPath)) {
     #         const content = fs.readFileSync(overviewPath, 'utf8');
