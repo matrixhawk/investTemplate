@@ -8,5 +8,9 @@
       "Bash(rm -rf ~/.claude/plugins/kimi-local)",
       "Bash(mkdir -p ~/.claude/plugins/kimi-local/.claude-plugin ~/.claude/plugins/kimi-local/commands ~/.claude/plugins/kimi-local/skills/kimi-cli-runtime ~/.claude/plugins/kimi-local/scripts)"
     ]
+  },
+  "preferences": {
+    "git_auto_push": true,
+    "notes": "本项目通过 Vercel Git 集成自动部署。当变更涉及站点文件且构建通过后，可直接执行 git add/commit/push 触发 Vercel 重新部署，无需每次询问确认。"
   }
 }
