@@ -37,9 +37,9 @@
 | 2026-05-11 | 2.38 | +560.20 | +1313.48 | +17.51% |
 
 
-### 收益率曲线
+### 收益率曲线（鼠标悬停查看详情）
 
-![VIX定投策略累计收益率曲线](/vix_strategy/returns_curve.svg)
+<iframe src="/vix_strategy/returns_curve.html" width="100%" height="520" frameborder="0" style="border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"></iframe>
 
 > 更新时间：2026-05-19 | 累计收益率：+14.62%
 

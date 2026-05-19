@@ -55,6 +55,7 @@ TRADES_FILE = STRATEGY_DIR / "trades.csv"
 SNAPSHOT_FILE = STRATEGY_DIR / "daily_snapshot.csv"
 DAILY_RETURNS_FILE = STRATEGY_DIR / "daily_returns.csv"
 RETURNS_CURVE_SVG = STRATEGY_DIR / "returns_curve.svg"
+RETURNS_CURVE_HTML = STRATEGY_DIR / "returns_curve.html"
 
 # 08-决策追踪目录（数据一致性要求）
 ALT_STRATEGY_DIR = ROOT / "08-决策追踪" / "vix_dca_strategy"
@@ -957,9 +958,9 @@ def update_markdown_template(state, date_str, vix, price):
 
     content += f"""
 
-### 收益率曲线
+### 收益率曲线（鼠标悬停查看详情）
 
-![VIX定投策略累计收益率曲线](/vix_strategy/returns_curve.svg)
+<iframe src="/vix_strategy/returns_curve.html" width="100%" height="520" frameborder="0" style="border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"></iframe>
 
 > 更新时间：{date_str} | 累计收益率：{perf['total_return_pct']:+.2f}%
 
@@ -1188,7 +1189,205 @@ def generate_returns_curve_svg(output_path, data_rows):
 
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write("".join(svg_parts))
-    print(f"[图表] 已生成收益率曲线: {output_path}")
+    print(f"[图表] 已生成收益率曲线SVG: {output_path}")
+
+
+def load_daily_returns_full():
+    """加载完整的每日收益率数据（包含所有字段用于tooltip）"""
+    rows = []
+    if DAILY_RETURNS_FILE.exists():
+        with open(DAILY_RETURNS_FILE, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                rows.append({
+                    'date': row['date'],
+                    'vix': row.get('vix', ''),
+                    'price': row.get('price', ''),
+                    'shares': row.get('shares', ''),
+                    'avg_cost': row.get('avg_cost', ''),
+                    'market_value': row.get('market_value', ''),
+                    'total_cost': row.get('total_cost', ''),
+                    'unrealized_pnl': row.get('unrealized_pnl', ''),
+                    'daily_pnl': row.get('daily_pnl', ''),
+                    'return_pct': row.get('return_pct', ''),
+                    'total_return_pct': row.get('total_return_pct', ''),
+                    'cash': row.get('cash', ''),
+                    'net_value': row.get('net_value', ''),
+                })
+    return rows
+
+
+def generate_returns_curve_html(output_path, data_rows):
+    """
+    生成交互式收益率曲线HTML（ECharts，支持鼠标悬停显示详细数据）
+    data_rows: list of dicts with full daily return fields
+    """
+    if not data_rows:
+        return
+
+    # 构建JS数据数组
+    dates = [r['date'] for r in data_rows]
+    total_returns = [round(float(r['total_return_pct']), 2) for r in data_rows]
+    daily_pnls = [round(float(r.get('daily_pnl', 0) or 0), 2) for r in data_rows]
+    prices = [round(float(r.get('price', 0) or 0), 3) for r in data_rows]
+    vixs = [round(float(r.get('vix', 0) or 0), 2) for r in data_rows]
+    market_values = [round(float(r.get('market_value', 0) or 0), 2) for r in data_rows]
+    unrealized_pnls = [round(float(r.get('unrealized_pnl', 0) or 0), 2) for r in data_rows]
+
+    dates_js = json.dumps(dates, ensure_ascii=False)
+    total_returns_js = json.dumps(total_returns, ensure_ascii=False)
+    daily_pnls_js = json.dumps(daily_pnls, ensure_ascii=False)
+    prices_js = json.dumps(prices, ensure_ascii=False)
+    vixs_js = json.dumps(vixs, ensure_ascii=False)
+    market_values_js = json.dumps(market_values, ensure_ascii=False)
+    unrealized_pnls_js = json.dumps(unrealized_pnls, ensure_ascii=False)
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIX定投策略 — 累计收益率曲线</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+  body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f8fafc; padding: 20px; }}
+  .chart-container {{ width: 100%; max-width: 960px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; }}
+  .chart-title {{ font-size: 18px; font-weight: 600; color: #1f2937; text-align: center; margin-bottom: 16px; }}
+  .chart-subtitle {{ font-size: 12px; color: #9ca3af; text-align: center; margin-bottom: 8px; }}
+  #chart {{ width: 100%; height: 420px; }}
+  .stats-bar {{ display: flex; justify-content: center; gap: 24px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; flex-wrap: wrap; }}
+  .stat-item {{ text-align: center; }}
+  .stat-label {{ font-size: 11px; color: #6b7280; }}
+  .stat-value {{ font-size: 14px; font-weight: 600; color: #1f2937; }}
+  .stat-value.positive {{ color: #16a34a; }}
+  .stat-value.negative {{ color: #dc2626; }}
+</style>
+</head>
+<body>
+<div class="chart-container">
+  <div class="chart-title">VIX定投策略 — 累计收益率曲线</div>
+  <div class="chart-subtitle">鼠标悬停查看每日详细数据 | 最后更新: {dates[-1] if dates else ''}</div>
+  <div id="chart"></div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-label">累计收益率</div>
+      <div class="stat-value {'positive' if total_returns[-1] >= 0 else 'negative'}">{total_returns[-1]:+.2f}%</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">最新价格</div>
+      <div class="stat-value">{prices[-1]:.3f}元</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">最新VIX</div>
+      <div class="stat-value">{vixs[-1]:.2f}</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">持仓市值</div>
+      <div class="stat-value">{market_values[-1]:,.2f}元</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">浮动盈亏</div>
+      <div class="stat-value {'positive' if unrealized_pnls[-1] >= 0 else 'negative'}">{unrealized_pnls[-1]:+.2f}元</div>
+    </div>
+  </div>
+</div>
+<script>
+  var chart = echarts.init(document.getElementById('chart'));
+  var dates = {dates_js};
+  var totalReturns = {total_returns_js};
+  var dailyPnls = {daily_pnls_js};
+  var prices = {prices_js};
+  var vixs = {vixs_js};
+  var marketValues = {market_values_js};
+  var unrealizedPnls = {unrealized_pnls_js};
+
+  var option = {{
+    tooltip: {{
+      trigger: 'axis',
+      backgroundColor: 'rgba(255,255,255,0.95)',
+      borderColor: '#e5e7eb',
+      borderWidth: 1,
+      textStyle: {{ color: '#1f2937', fontSize: 12 }},
+      formatter: function(params) {{
+        var idx = params[0].dataIndex;
+        var color = totalReturns[idx] >= 0 ? '#16a34a' : '#dc2626';
+        return '<div style="font-weight:600;margin-bottom:6px;">' + dates[idx] + '</div>' +
+          '<div style="display:grid;grid-template-columns:auto auto;gap:4px 16px;">' +
+          '<span style="color:#6b7280;">累计收益率:</span> <span style="font-weight:600;color:' + color + '">' + (totalReturns[idx] >= 0 ? '+' : '') + totalReturns[idx].toFixed(2) + '%</span>' +
+          '<span style="color:#6b7280;">当日盈亏:</span> <span style="font-weight:600;">' + (dailyPnls[idx] >= 0 ? '+' : '') + dailyPnls[idx].toFixed(2) + '元</span>' +
+          '<span style="color:#6b7280;">ETF价格:</span> <span style="font-weight:600;">' + prices[idx].toFixed(3) + '元</span>' +
+          '<span style="color:#6b7280;">VIX:</span> <span style="font-weight:600;">' + vixs[idx].toFixed(2) + '</span>' +
+          '<span style="color:#6b7280;">持仓市值:</span> <span style="font-weight:600;">' + marketValues[idx].toLocaleString('zh-CN', {{minimumFractionDigits:2}}) + '元</span>' +
+          '<span style="color:#6b7280;">浮动盈亏:</span> <span style="font-weight:600;color:' + color + '">' + (unrealizedPnls[idx] >= 0 ? '+' : '') + unrealizedPnls[idx].toFixed(2) + '元</span>' +
+          '</div>';
+      }}
+    }},
+    grid: {{ left: '3%', right: '4%', bottom: '3%', top: '8%', containLabel: true }},
+    xAxis: {{
+      type: 'category',
+      boundaryGap: false,
+      data: dates,
+      axisLine: {{ lineStyle: {{ color: '#e5e7eb' }} }},
+      axisLabel: {{ color: '#6b7280', fontSize: 10, rotate: 30 }},
+      axisTick: {{ show: false }}
+    }},
+    yAxis: {{
+      type: 'value',
+      axisLabel: {{ formatter: '{{value}}%', color: '#6b7280', fontSize: 11 }},
+      axisLine: {{ show: false }},
+      splitLine: {{ lineStyle: {{ color: '#f3f4f6', type: 'dashed' }} }},
+      scale: true
+    }},
+    series: [
+      {{
+        name: '累计收益率',
+        type: 'line',
+        smooth: 0.3,
+        symbol: 'circle',
+        symbolSize: 6,
+        showSymbol: false,
+        lineStyle: {{ width: 3, color: '#16a34a' }},
+        itemStyle: {{ color: '#16a34a', borderWidth: 2, borderColor: '#fff' }},
+        areaStyle: {{
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {{ offset: 0, color: 'rgba(22, 163, 74, 0.2)' }},
+            {{ offset: 1, color: 'rgba(22, 163, 74, 0.02)' }}
+          ])
+        }},
+        data: totalReturns,
+        markLine: {{
+          silent: true,
+          symbol: 'none',
+          lineStyle: {{ color: '#9ca3af', type: 'solid', width: 1 }},
+          data: [{{ yAxis: 0 }}],
+          label: {{ show: false }}
+        }}
+      }}
+    ],
+    animationDuration: 800,
+    animationEasing: 'cubicOut'
+  }};
+
+  // 根据最终收益率颜色调整
+  if (totalReturns[totalReturns.length - 1] < 0) {{
+    option.series[0].lineStyle.color = '#dc2626';
+    option.series[0].itemStyle.color = '#dc2626';
+    option.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+      {{ offset: 0, color: 'rgba(220, 38, 38, 0.2)' }},
+      {{ offset: 1, color: 'rgba(220, 38, 38, 0.02)' }}
+    ]);
+  }}
+
+  chart.setOption(option);
+  window.addEventListener('resize', function() {{ chart.resize(); }});
+</script>
+</body>
+</html>"""
+
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f"[图表] 已生成交互式收益率曲线HTML: {output_path}")
 
 
 def record_daily_return(date_str, vix, price, state, daily_pnl, total_return_pct):
@@ -1363,7 +1562,15 @@ def sync_to_public(state, dashboard):
         with open(RETURNS_CURVE_SVG, 'r', encoding='utf-8') as src:
             with open(public_svg, 'w', encoding='utf-8') as dst:
                 dst.write(src.read())
-        print(f"[同步] 已同步收益率曲线到: {public_svg}")
+        print(f"[同步] 已同步收益率曲线SVG到: {public_svg}")
+
+    # 同步收益率曲线HTML（交互式）
+    if RETURNS_CURVE_HTML.exists():
+        public_html = PUBLIC_DIR / "returns_curve.html"
+        with open(RETURNS_CURVE_HTML, 'r', encoding='utf-8') as src:
+            with open(public_html, 'w', encoding='utf-8') as dst:
+                dst.write(src.read())
+        print(f"[同步] 已同步收益率曲线HTML到: {public_html}")
 
     # 同步到 08-决策追踪 目录（数据一致性要求）
     if ALT_STRATEGY_DIR.exists():
@@ -1385,7 +1592,15 @@ def sync_to_public(state, dashboard):
             with open(RETURNS_CURVE_SVG, 'r', encoding='utf-8') as src:
                 with open(alt_svg, 'w', encoding='utf-8') as dst:
                     dst.write(src.read())
-            print(f"[同步] 已同步收益率曲线到: {alt_svg}")
+            print(f"[同步] 已同步收益率曲线SVG到: {alt_svg}")
+
+        # 同步收益率曲线HTML
+        alt_html = ALT_STRATEGY_DIR / "returns_curve.html"
+        if RETURNS_CURVE_HTML.exists():
+            with open(RETURNS_CURVE_HTML, 'r', encoding='utf-8') as src:
+                with open(alt_html, 'w', encoding='utf-8') as dst:
+                    dst.write(src.read())
+            print(f"[同步] 已同步收益率曲线HTML到: {alt_html}")
 
 
 # ==================== 主程序 ====================
@@ -1493,6 +1708,11 @@ def main():
         returns_history = load_daily_returns()
         if returns_history:
             generate_returns_curve_svg(RETURNS_CURVE_SVG, returns_history)
+
+        # 生成交互式HTML图表（支持鼠标悬停）
+        returns_history_full = load_daily_returns_full()
+        if returns_history_full:
+            generate_returns_curve_html(RETURNS_CURVE_HTML, returns_history_full)
 
         if trade_infos:
             record_trades(trade_infos, state, date_str)
