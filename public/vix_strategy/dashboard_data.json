@@ -21,7 +21,7 @@
   "performance": {
     "total_pnl": 1091.72,
     "total_return_pct": 14.62,
-    "daily_pnl": -18.62,
+    "daily_pnl": 0.0,
     "vix": 18.15,
     "date": "2026-05-19"
   },
@@ -65,7 +65,7 @@
       "date": "2026-05-19",
       "price": 2.306,
       "pnl": 1091.72,
-      "daily_pnl": -18.62
+      "daily_pnl": 0.0
     },
     {
       "date": "2026-05-18",

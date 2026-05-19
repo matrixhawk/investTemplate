@@ -53,6 +53,11 @@ STATE_FILE = STRATEGY_DIR / "state.json"
 DASHBOARD_FILE = STRATEGY_DIR / "dashboard_data.json"
 TRADES_FILE = STRATEGY_DIR / "trades.csv"
 SNAPSHOT_FILE = STRATEGY_DIR / "daily_snapshot.csv"
+DAILY_RETURNS_FILE = STRATEGY_DIR / "daily_returns.csv"
+RETURNS_CURVE_SVG = STRATEGY_DIR / "returns_curve.svg"
+
+# 08-决策追踪目录（数据一致性要求）
+ALT_STRATEGY_DIR = ROOT / "08-决策追踪" / "vix_dca_strategy"
 
 # ETF代码
 ETF_CODE = "513110"
@@ -950,7 +955,14 @@ def update_markdown_template(state, date_str, vix, price):
         marker = "**" if snap_date == date_str else ""
         content += f"| {marker}{snap_date}{marker} | {marker}{snap_price:.2f}{marker} | {marker}{snap_daily:+.2f}{marker} | {marker}{snap_pnl:+.2f}{marker} | {marker}{snap_return:+.2f}%{marker} |\n"
 
-    content += """
+    content += f"""
+
+### 收益率曲线
+
+![VIX定投策略累计收益率曲线](/vix_strategy/returns_curve.svg)
+
+> 更新时间：{date_str} | 累计收益率：{perf['total_return_pct']:+.2f}%
+
 ---
 
 ## 交易记录
@@ -1066,6 +1078,220 @@ def update_markdown_template(state, date_str, vix, price):
     print(f"[Markdown] 已更新 {template_path}")
 
 
+# ==================== 收益率曲线图 ====================
+
+def generate_returns_curve_svg(output_path, data_rows):
+    """
+    生成收益率曲线SVG图（纯Python，无外部依赖）
+    data_rows: list of dicts with keys: date, total_return_pct
+    """
+    if not data_rows:
+        return
+
+    # 图表尺寸
+    width = 900
+    height = 400
+    margin = {'top': 40, 'right': 40, 'bottom': 60, 'left': 70}
+    chart_w = width - margin['left'] - margin['right']
+    chart_h = height - margin['top'] - margin['bottom']
+
+    # 数据准备
+    returns = [float(r['total_return_pct']) for r in data_rows]
+    dates = [r['date'] for r in data_rows]
+    n = len(returns)
+
+    min_ret = min(returns) if returns else 0
+    max_ret = max(returns) if returns else 0
+    # 以0为基准，确保0线在可视范围内
+    y_min = min(min_ret, 0) * 1.1
+    y_max = max(max_ret, 0) * 1.1
+    if abs(y_max - y_min) < 0.01:
+        y_min -= 0.5
+        y_max += 0.5
+
+    def x_scale(i):
+        return margin['left'] + (i / max(n - 1, 1)) * chart_w
+
+    def y_scale(v):
+        return margin['top'] + chart_h - ((v - y_min) / (y_max - y_min)) * chart_h
+
+    # 构建折线路径
+    points = []
+    for i, ret in enumerate(returns):
+        px = x_scale(i)
+        py = y_scale(ret)
+        points.append(f"{px:.1f},{py:.1f}")
+
+    line_path = "M" + " L".join(points)
+
+    # 区域填充路径（到零线）
+    zero_y = y_scale(0)
+    area_path = line_path + f" L{x_scale(n-1):.1f},{zero_y:.1f} L{x_scale(0):.1f},{zero_y:.1f} Z"
+
+    # Y轴刻度
+    y_ticks = []
+    y_labels = []
+    tick_count = 5
+    for i in range(tick_count + 1):
+        val = y_min + (y_max - y_min) * (i / tick_count)
+        y_pos = y_scale(val)
+        y_ticks.append(f"<line x1='{margin['left']}' y1='{y_pos:.1f}' x2='{width - margin['right']}' y2='{y_pos:.1f}' stroke='#e5e7eb' stroke-width='1' stroke-dasharray='2,2'/>")
+        y_labels.append(f"<text x='{margin['left'] - 10}' y='{y_pos + 4:.1f}' text-anchor='end' font-size='11' fill='#6b7280'>{val:.1f}%</text>")
+
+    # X轴刻度（显示约6个日期）
+    x_labels = []
+    step = max(1, n // 6)
+    for i in range(0, n, step):
+        px = x_scale(i)
+        x_labels.append(f"<text x='{px:.1f}' y='{height - margin['bottom'] + 20}' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 {px:.1f},{height - margin['bottom'] + 20})'>{dates[i]}</text>")
+
+    # 零线
+    zero_line = f"<line x1='{margin['left']}' y1='{zero_y:.1f}' x2='{width - margin['right']}' y2='{zero_y:.1f}' stroke='#9ca3af' stroke-width='1.5'/>"
+
+    # 最新收益率点
+    last_px = x_scale(n - 1)
+    last_py = y_scale(returns[-1])
+    last_color = '#16a34a' if returns[-1] >= 0 else '#dc2626'
+
+    # 计算每日变化用于着色
+    # 正收益天数用绿色区域，负收益用红色区域
+    # 简化：整体区域根据最终收益率着色，折线用渐变色
+
+    svg_parts = [
+        f"""<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {width} {height}' width='100%' height='100%'>
+  <defs>
+    <linearGradient id='areaGradient' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0%' stop-color='{('#16a34a' if max_ret >= 0 else '#dc2626')}' stop-opacity='0.15'/>
+      <stop offset='100%' stop-color='{('#16a34a' if max_ret >= 0 else '#dc2626')}' stop-opacity='0.02'/>
+    </linearGradient>
+  </defs>
+  <rect width='{width}' height='{height}' fill='#ffffff' rx='8'/>
+  <text x='{width/2}' y='25' text-anchor='middle' font-size='16' font-weight='bold' fill='#1f2937'>VIX定投策略 — 累计收益率曲线</text>
+""",
+        "  <!-- Grid -->\n",
+        "\n".join(y_ticks),
+        "\n",
+        zero_line,
+        "\n",
+        f"  <path d='{area_path}' fill='url(#areaGradient)' stroke='none'/>\n",
+        f"  <path d='{line_path}' fill='none' stroke='{last_color}' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/>\n",
+        f"  <circle cx='{last_px:.1f}' cy='{last_py:.1f}' r='5' fill='{last_color}' stroke='#ffffff' stroke-width='2'/>\n",
+        f"  <text x='{last_px:.1f}' y='{last_py - 12:.1f}' text-anchor='middle' font-size='11' font-weight='bold' fill='{last_color}'>{returns[-1]:+.2f}%</text>\n",
+        "  <!-- Axis labels -->\n",
+        "\n".join(y_labels),
+        "\n",
+        "\n".join(x_labels),
+        "\n",
+        f"  <text x='{margin['left']}' y='{height - 10}' font-size='10' fill='#9ca3af'>数据来源: VIX定投策略 | 每日更新</text>",
+        "</svg>"
+    ]
+
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write("".join(svg_parts))
+    print(f"[图表] 已生成收益率曲线: {output_path}")
+
+
+def record_daily_return(date_str, vix, price, state, daily_pnl, total_return_pct):
+    """记录每日收益率到独立CSV文件"""
+    pos = state['position']
+    acc = state['account']
+
+    # 确保文件存在并写入表头
+    headers = ['date', 'vix', 'price', 'shares', 'avg_cost', 'market_value',
+               'total_cost', 'unrealized_pnl', 'daily_pnl', 'return_pct',
+               'total_return_pct', 'cash', 'net_value', 'note']
+
+    file_exists = DAILY_RETURNS_FILE.exists()
+    rows = []
+    if file_exists:
+        with open(DAILY_RETURNS_FILE, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            rows = list(reader)
+        # 检查是否已存在该日期
+        for row in rows[1:]:
+            if row and row[0] == date_str:
+                print(f"[收益率] {date_str} 已存在，跳过")
+                return
+    else:
+        # 首次创建：从 daily_snapshot.csv 导入历史数据
+        if SNAPSHOT_FILE.exists():
+            with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                snap_rows = list(reader)
+            if snap_rows:
+                with open(DAILY_RETURNS_FILE, 'w', newline='', encoding='utf-8') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(headers)
+                    for row in snap_rows:
+                        ret_str = row.get('total_return_pct', '0').replace('%', '')
+                        writer.writerow([
+                            row['date'],
+                            row.get('vix', ''),
+                            row.get('etf_close', row.get('price', '')),
+                            row.get('position_shares', row.get('shares', '')),
+                            '',  # avg_cost
+                            row.get('position_value', ''),
+                            row.get('total_cost', ''),
+                            row.get('unrealized_pnl', ''),
+                            row.get('daily_pnl', ''),
+                            '',  # return_pct
+                            ret_str,
+                            row.get('cash', ''),
+                            row.get('net_value', ''),
+                            row.get('note', '')
+                        ])
+                print(f"[收益率] 已从 daily_snapshot.csv 导入 {len(snap_rows)} 条历史数据")
+                rows = [headers] + [[r.get(h, '') for h in headers] for r in snap_rows]
+
+    with open(DAILY_RETURNS_FILE, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        if not file_exists and not rows:
+            writer.writerow(headers)
+        writer.writerow([
+            date_str,
+            vix,
+            price,
+            pos['shares'],
+            round(pos['avg_cost'], 4),
+            round(pos['market_value'], 2),
+            round(pos['total_cost'], 2),
+            round(pos['unrealized_pnl'], 2),
+            round(daily_pnl, 2),
+            pos['return_pct'],
+            round(total_return_pct, 2),
+            round(float(acc.get('cash', 0) or 0), 2),
+            round(get_total_assets_value(state), 2),
+            f"VIX{vix}"
+        ])
+    print(f"[收益率] 已记录 {date_str} 到 daily_returns.csv")
+
+
+def load_daily_returns():
+    """加载历史每日收益率数据，优先从 daily_returns.csv，不存在则从 daily_snapshot.csv 回退"""
+    rows = []
+    if DAILY_RETURNS_FILE.exists():
+        with open(DAILY_RETURNS_FILE, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                rows.append({
+                    'date': row['date'],
+                    'total_return_pct': row['total_return_pct']
+                })
+        return rows
+
+    # 回退：从 daily_snapshot.csv 导入历史数据
+    if SNAPSHOT_FILE.exists():
+        with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                ret_str = row.get('total_return_pct', '0').replace('%', '')
+                rows.append({
+                    'date': row['date'],
+                    'total_return_pct': ret_str
+                })
+    return rows
+
+
 # ==================== 记录与同步 ====================
 
 def record_snapshot(date_str, vix, price, state, daily_pnl, note):
@@ -1130,6 +1356,36 @@ def sync_to_public(state, dashboard):
     public_file = PUBLIC_DIR / "dashboard_data.json"
     save_json(public_file, dashboard)
     print(f"[同步] 已同步到: {public_file}")
+
+    # 同步收益率曲线SVG
+    if RETURNS_CURVE_SVG.exists():
+        public_svg = PUBLIC_DIR / "returns_curve.svg"
+        with open(RETURNS_CURVE_SVG, 'r', encoding='utf-8') as src:
+            with open(public_svg, 'w', encoding='utf-8') as dst:
+                dst.write(src.read())
+        print(f"[同步] 已同步收益率曲线到: {public_svg}")
+
+    # 同步到 08-决策追踪 目录（数据一致性要求）
+    if ALT_STRATEGY_DIR.exists():
+        alt_dashboard = ALT_STRATEGY_DIR / "dashboard_data.json"
+        save_json(alt_dashboard, dashboard)
+        print(f"[同步] 已同步到: {alt_dashboard}")
+
+        # 同步 daily_returns.csv
+        alt_returns = ALT_STRATEGY_DIR / "daily_returns.csv"
+        if DAILY_RETURNS_FILE.exists():
+            with open(DAILY_RETURNS_FILE, 'r', encoding='utf-8') as src:
+                with open(alt_returns, 'w', encoding='utf-8') as dst:
+                    dst.write(src.read())
+            print(f"[同步] 已同步 daily_returns.csv 到: {alt_returns}")
+
+        # 同步收益率曲线SVG
+        alt_svg = ALT_STRATEGY_DIR / "returns_curve.svg"
+        if RETURNS_CURVE_SVG.exists():
+            with open(RETURNS_CURVE_SVG, 'r', encoding='utf-8') as src:
+                with open(alt_svg, 'w', encoding='utf-8') as dst:
+                    dst.write(src.read())
+            print(f"[同步] 已同步收益率曲线到: {alt_svg}")
 
 
 # ==================== 主程序 ====================
@@ -1228,6 +1484,15 @@ def main():
 
         note = f"VIX{vix}," + ("; ".join(pnl_data.get('notes', [])) if pnl_data.get('notes') else ("定投日" if is_trading else "持仓不动"))
         record_snapshot(date_str, vix, price, state, pnl_data['daily_pnl'], note)
+
+        # 记录每日收益率到新文件
+        record_daily_return(date_str, vix, price, state, pnl_data['daily_pnl'],
+                           state['daily_performance']['total_return_pct'])
+
+        # 生成收益率曲线图
+        returns_history = load_daily_returns()
+        if returns_history:
+            generate_returns_curve_svg(RETURNS_CURVE_SVG, returns_history)
 
         if trade_infos:
             record_trades(trade_infos, state, date_str)
