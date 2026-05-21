@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: '投资分析模板',
-  description: '港股/A股个股投资分析框架 V5.5.18',
+  description: '港股/A股个股投资分析框架 V5.5.20',
   lang: 'zh-CN',
   
   // 忽略的死链（有些文件可能临时不存在）
@@ -131,7 +131,7 @@ export default defineConfig({
     // 页脚
     footer: {
       message: '基于 Apache License 2.0 开源协议',
-      copyright: 'Copyright © 2026 投资分析模板 V5.5.18'
+      copyright: 'Copyright © 2026 投资分析模板 V5.5.20'
     },
     
     // 大纲显示级别
