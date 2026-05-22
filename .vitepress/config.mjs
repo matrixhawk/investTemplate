@@ -95,7 +95,8 @@ export default defineConfig({
           { text: '青岛啤酒_600600_投资分析报告', link: '/analysis-reports/青岛啤酒_600600_投资分析报告' },
           { text: '华润医药_03320_投资分析报告', link: '/analysis-reports/华润医药_03320_投资分析报告' },
           { text: '中国食品_00506_投资分析报告', link: '/analysis-reports/中国食品_00506_投资分析报告' },
-          { text: '达势股份_01405_投资分析报告', link: '/analysis-reports/达势股份_01405_投资分析报告' }
+          { text: '达势股份_01405_投资分析报告', link: '/analysis-reports/达势股份_01405_投资分析报告' },
+          { text: '山东药玻_600529_投资分析报告', link: '/analysis-reports/山东药玻_600529_投资分析报告' }
         ]
       }
       ]
