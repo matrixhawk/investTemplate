@@ -14,7 +14,7 @@
     "initial_capital": 100000,
     "currency": "CNY",
     "cash": 93994.0,
-    "last_update": "2026-05-25"
+    "last_update": "2026-05-27"
   },
   "position": {
     "shares": 3728,
@@ -26,8 +26,8 @@
     "return_pct": 16.53
   },
   "daily_performance": {
-    "date": "2026-05-25",
-    "vix": 16.62,
+    "date": "2026-05-27",
+    "vix": 16.9,
     "daily_pnl": 0.0,
     "total_pnl": 1240.84,
     "total_return_pct": 16.61
