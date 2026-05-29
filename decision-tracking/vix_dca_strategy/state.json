@@ -20,17 +20,17 @@
     "shares": 4067,
     "avg_cost": 2.0645,
     "total_cost": 8396.49,
-    "current_price": 2.346,
-    "market_value": 9541.18,
-    "unrealized_pnl": 1144.69,
-    "return_pct": 13.63
+    "current_price": 2.54,
+    "market_value": 10330.18,
+    "unrealized_pnl": 1933.69,
+    "return_pct": 23.03
   },
   "daily_performance": {
     "date": "2026-05-29",
     "vix": 15.84,
-    "daily_pnl": 0.0,
-    "total_pnl": 1144.69,
-    "total_return_pct": 13.63
+    "daily_pnl": 292.82,
+    "total_pnl": 1933.69,
+    "total_return_pct": 23.03
   },
   "statistics": {
     "cumulative_buy": 8400.0,
