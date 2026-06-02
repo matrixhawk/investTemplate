@@ -1,0 +1,44 @@
+name: VIX定投策略数据校验
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'decision-tracking/vix_dca_strategy/**'
+      - 'public/vix_strategy/**'
+      - 'portfolio/vix-dca-strategy.md'
+      - '08-决策追踪/vix_dca_strategy/**'
+      - 'scripts/validate_vix_dca.py'
+      - 'scripts/auto_update_vix_dca.py'
+      - 'AGENTS.md'
+
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  validate-vix-dca:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 设置 Python 环境
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: 执行数据一致性校验
+      run: |
+        echo "=== VIX定投策略数据一致性校验 ==="
+        python scripts/validate_vix_dca.py
+        EXIT_CODE=$?
+        if [ $EXIT_CODE -ne 0 ]; then
+          echo ""
+          echo "❌ 校验失败！请修复数据不一致问题后再推送。"
+          exit 1
+        fi
+        echo ""
+        echo "✅ 校验通过，数据一致。"

@@ -15,54 +15,54 @@
     "capital_mode": "dca",
     "currency": "CNY",
     "cash": 91603.51,
-    "last_update": "2026-06-01"
+    "last_update": "2026-06-02"
   },
   "position": {
-    "shares": 4067,
-    "avg_cost": 2.0645,
-    "total_cost": 8396.49,
-    "current_price": 2.54,
-    "market_value": 10330.18,
-    "unrealized_pnl": 1933.6900000000005,
-    "return_pct": 23.03
+    "shares": 4566,
+    "avg_cost": 2.1233066141042487,
+    "total_cost": 9695.018,
+    "current_price": 2.602,
+    "market_value": 11880.732,
+    "unrealized_pnl": 2185.714,
+    "return_pct": 22.54
   },
   "daily_performance": {
-    "date": "2026-06-01",
-    "vix": 15.82,
-    "daily_pnl": 0.0,
-    "total_pnl": 1933.69,
-    "total_return_pct": 22.98
+    "date": "2026-06-02",
+    "vix": 16.12,
+    "daily_pnl": 252.02,
+    "total_pnl": 2185.71,
+    "total_return_pct": 22.48
   },
   "statistics": {
-    "cumulative_buy": 8400.0,
+    "cumulative_buy": 9700.0,
     "cumulative_sell": 0,
-    "trade_count": 4,
-    "buy_count": 4,
+    "trade_count": 5,
+    "buy_count": 5,
     "sell_count": 0,
-    "total_invested": 8400.0,
+    "total_invested": 9700.0,
     "hold_days": 14,
-    "last_trade_date": "2026-05-19",
-    "next_trade_date": "2026-06-02"
+    "last_trade_date": "2026-06-02",
+    "next_trade_date": "2026-06-16"
   },
   "schedule": {
     "frequency": "每双周周二",
     "anchor_date": "2026-03-24",
     "upcoming_trade_dates": [
-      "2026-06-02",
       "2026-06-16",
       "2026-06-30",
       "2026-07-14",
-      "2026-07-28"
+      "2026-07-28",
+      "2026-08-11"
     ],
-    "next_trade_date": "2026-06-02"
+    "next_trade_date": "2026-06-16"
   },
   "history": {
     "vix_high": 21.23,
     "vix_high_date": "2026-04-13",
     "vix_low": 15.82,
     "vix_low_date": "2026-06-01",
-    "max_unrealized_pnl": 1933.6900000000005,
-    "max_unrealized_date": "2026-06-01"
+    "max_unrealized_pnl": 2185.714,
+    "max_unrealized_date": "2026-06-02"
   },
   "strategy_state": {
     "biweekly_vix_log": [
@@ -81,6 +81,10 @@
       {
         "date": "2026-05-19",
         "vix": 18.15
+      },
+      {
+        "date": "2026-06-02",
+        "vix": 16.12
       }
     ],
     "cumulative_sell_ratio": 0.0,
