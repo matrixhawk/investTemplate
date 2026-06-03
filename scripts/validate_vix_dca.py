@@ -180,7 +180,12 @@ def check_daily_snapshot():
     """校验3: daily_snapshot.csv 数据完整性"""
     print("\n【校验3】daily_snapshot.csv 数据完整性")
 
-    snap_rows = load_csv_rows(STRATEGY_DIR / "daily_snapshot.csv")
+    snapshot_path = STRATEGY_DIR / "daily_snapshot.csv"
+    if not snapshot_path.exists():
+        error("daily_snapshot.csv 缺失，请确认该文件已生成并提交到仓库")
+        return
+
+    snap_rows = load_csv_rows(snapshot_path)
     ret_rows = load_csv_rows(STRATEGY_DIR / "daily_returns.csv")
 
     if len(snap_rows) < len(ret_rows):
