@@ -1708,9 +1708,9 @@ def record_snapshot(date_str, vix, price, state, daily_pnl, note):
         writer = csv.writer(f)
         cash = float(acc.get('cash', 0) or 0)
         writer.writerow([
-            date_str, vix, price, pos['shares'], pos['market_value'],
-            cash, get_total_assets_value(state), pos['total_cost'],
-            pos['unrealized_pnl'], daily_pnl, pos['return_pct'], note
+            date_str, vix, price, pos['shares'], round(pos['market_value'], 2),
+            round(cash, 2), round(get_total_assets_value(state), 2), round(pos['total_cost'], 2),
+            round(pos['unrealized_pnl'], 2), round(daily_pnl, 2), pos['return_pct'], note
         ])
     print(f"[快照] 已记录 {date_str}")
 
@@ -1764,6 +1764,14 @@ def sync_to_public(state, dashboard):
             with open(public_html, 'w', encoding='utf-8') as dst:
                 dst.write(src.read())
         print(f"[同步] 已同步收益率曲线HTML到: {public_html}")
+
+    # 同步 daily_returns.csv 到 public（校验脚本要求）
+    if DAILY_RETURNS_FILE.exists():
+        public_returns = PUBLIC_DIR / "daily_returns.csv"
+        with open(DAILY_RETURNS_FILE, 'r', encoding='utf-8') as src:
+            with open(public_returns, 'w', encoding='utf-8') as dst:
+                dst.write(src.read())
+        print(f"[同步] 已同步 daily_returns.csv 到: {public_returns}")
 
     # 同步到 08-决策追踪 目录（数据一致性要求）
     if ALT_STRATEGY_DIR.exists():
