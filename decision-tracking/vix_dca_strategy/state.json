@@ -15,7 +15,7 @@
     "capital_mode": "dca",
     "currency": "CNY",
     "cash": 91603.51,
-    "last_update": "2026-06-04"
+    "last_update": "2026-06-05"
   },
   "position": {
     "shares": 4566,
@@ -27,8 +27,8 @@
     "return_pct": 22.54
   },
   "daily_performance": {
-    "date": "2026-06-04",
-    "vix": 16.6,
+    "date": "2026-06-05",
+    "vix": 15.64,
     "daily_pnl": 0.0,
     "total_pnl": 2185.71,
     "total_return_pct": 22.48
@@ -59,8 +59,8 @@
   "history": {
     "vix_high": 21.23,
     "vix_high_date": "2026-04-13",
-    "vix_low": 15.82,
-    "vix_low_date": "2026-06-01",
+    "vix_low": 15.64,
+    "vix_low_date": "2026-06-05",
     "max_unrealized_pnl": 2185.714,
     "max_unrealized_date": "2026-06-02"
   },
