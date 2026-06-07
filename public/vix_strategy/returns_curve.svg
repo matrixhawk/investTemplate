@@ -15,10 +15,10 @@
 <line x1='70' y1='100.0' x2='860' y2='100.0' stroke='#e5e7eb' stroke-width='1' stroke-dasharray='2,2'/>
 <line x1='70' y1='40.0' x2='860' y2='40.0' stroke='#e5e7eb' stroke-width='1' stroke-dasharray='2,2'/>
 <line x1='70' y1='339.3' x2='860' y2='339.3' stroke='#9ca3af' stroke-width='1.5'/>
-  <path d='M70.0,339.9 L149.0,337.9 L228.0,261.8 L307.0,201.4 L386.0,108.5 L465.0,67.2 L544.0,67.2 L623.0,73.1 L702.0,73.1 L781.0,73.1 L860.0,73.1 L860.0,339.3 L70.0,339.3 Z' fill='url(#areaGradient)' stroke='none'/>
-  <path d='M70.0,339.9 L149.0,337.9 L228.0,261.8 L307.0,201.4 L386.0,108.5 L465.0,67.2 L544.0,67.2 L623.0,73.1 L702.0,73.1 L781.0,73.1 L860.0,73.1' fill='none' stroke='#16a34a' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/>
-  <circle cx='860.0' cy='73.1' r='5' fill='#16a34a' stroke='#ffffff' stroke-width='2'/>
-  <text x='860.0' y='61.1' text-anchor='middle' font-size='11' font-weight='bold' fill='#16a34a'>+22.48%</text>
+  <path d='M70.0,339.9 L149.0,337.9 L228.0,261.8 L307.0,201.4 L386.0,108.5 L465.0,67.2 L544.0,67.2 L623.0,73.1 L702.0,94.8 L781.0,130.6 L860.0,150.6 L860.0,339.3 L70.0,339.3 Z' fill='url(#areaGradient)' stroke='none'/>
+  <path d='M70.0,339.9 L149.0,337.9 L228.0,261.8 L307.0,201.4 L386.0,108.5 L465.0,67.2 L544.0,67.2 L623.0,73.1 L702.0,94.8 L781.0,130.6 L860.0,150.6' fill='none' stroke='#16a34a' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/>
+  <circle cx='860.0' cy='150.6' r='5' fill='#16a34a' stroke='#ffffff' stroke-width='2'/>
+  <text x='860.0' y='138.6' text-anchor='middle' font-size='11' font-weight='bold' fill='#16a34a'>+15.94%</text>
   <!-- Axis labels -->
 <text x='60' y='344.0' text-anchor='end' font-size='11' fill='#6b7280'>-0.1%</text>
 <text x='60' y='284.0' text-anchor='end' font-size='11' fill='#6b7280'>5.0%</text>
