@@ -1,17 +1,17 @@
 {
   "meta": {
-    "template_version": "V5.5.22",
-    "engine_version": "V4.0",
-    "generated_at": "2026-06-08 10:12:32",
+    "template_version": "V5.5.12",
+    "engine_version": "V3.1",
+    "generated_at": "2026-06-08 12:44:47",
     "latest_trade_date": "2026-06-08"
   },
   "portfolio": {
     "initial_capital": 500000.0,
     "cash": 109160.0,
-    "market_value": 390840.0,
-    "net_value": 500000.0,
-    "total_return_pct": 0.0,
-    "position_ratio_pct": 78.168,
+    "market_value": 360170.01,
+    "net_value": 469330.01,
+    "total_return_pct": -6.134,
+    "position_ratio_pct": 72.034,
     "positions": [
       {
         "name": "天津发展",
@@ -19,13 +19,13 @@
         "ticker": "0882.HK",
         "shares": 40000,
         "avg_cost": 2.55,
-        "close": 2.55,
-        "change_pct": 0.0,
-        "market_value": 102000.0,
-        "unrealized": 0.0,
+        "close": 2.13,
+        "change_pct": -4.0541,
+        "market_value": 85200.0,
+        "unrealized": -16800.0,
         "sell_trigger": 4.5,
-        "weight_pct": 20.4,
-        "status": "占位"
+        "weight_pct": 18.1535,
+        "status": "实时"
       },
       {
         "name": "京投交通科技",
@@ -33,13 +33,13 @@
         "ticker": "1522.HK",
         "shares": 342000,
         "avg_cost": 0.295,
-        "close": 0.295,
+        "close": 0.285,
         "change_pct": 0.0,
-        "market_value": 100890.0,
-        "unrealized": 0.0,
+        "market_value": 97470.0,
+        "unrealized": -3420.0,
         "sell_trigger": 0.6,
-        "weight_pct": 20.178,
-        "status": "占位"
+        "weight_pct": 20.7679,
+        "status": "实时"
       },
       {
         "name": "华润医药",
@@ -47,13 +47,13 @@
         "ticker": "3320.HK",
         "shares": 15000,
         "avg_cost": 5.33,
-        "close": 5.33,
-        "change_pct": 0.0,
-        "market_value": 79950.0,
-        "unrealized": 0.0,
+        "close": 4.75,
+        "change_pct": 0.4228,
+        "market_value": 71250.0,
+        "unrealized": -8700.0,
         "sell_trigger": 9.0,
-        "weight_pct": 15.99,
-        "status": "占位"
+        "weight_pct": 15.1812,
+        "status": "实时"
       },
       {
         "name": "汇贤产业信托",
@@ -61,61 +61,15 @@
         "ticker": "87001.HK",
         "shares": 250000,
         "avg_cost": 0.432,
-        "close": 0.432,
+        "close": 0.425,
         "change_pct": 0.0,
-        "market_value": 108000.0,
-        "unrealized": 0.0,
+        "market_value": 106250.0,
+        "unrealized": -1750.0,
         "sell_trigger": 1.0,
-        "weight_pct": 21.6,
-        "status": "占位"
+        "weight_pct": 22.6387,
+        "status": "实时"
       }
     ]
   },
-  "today_actions": [],
-  "recent_actions": [
-    {
-      "date": "2026-03-26",
-      "ticker": "1522.HK",
-      "name": "京投交通科技",
-      "action": "INIT_BUY",
-      "price": 0.295,
-      "shares": 342000,
-      "amount": 100890.0,
-      "reason": "初始建仓（3月26日收盘价）"
-    },
-    {
-      "date": "2026-03-26",
-      "ticker": "87001.HK",
-      "name": "汇贤产业信托",
-      "action": "INIT_BUY",
-      "price": 0.432,
-      "shares": 250000,
-      "amount": 108000.0,
-      "reason": "初始建仓（3月26日收盘价）"
-    },
-    {
-      "date": "2026-03-26",
-      "ticker": "0882.HK",
-      "name": "天津发展",
-      "action": "INIT_BUY",
-      "price": 2.55,
-      "shares": 40000,
-      "amount": 102000.0,
-      "reason": "初始建仓（3月26日收盘价）"
-    },
-    {
-      "date": "2026-03-26",
-      "ticker": "3320.HK",
-      "name": "华润医药",
-      "action": "INIT_BUY",
-      "price": 5.33,
-      "shares": 15000,
-      "amount": 79950.0,
-      "reason": "初始建仓（3月26日收盘价）"
-    }
-  ],
-  "ai_summary": {
-    "ai_decisions_today": 0,
-    "rule_decisions_today": 0
-  }
+  "today_actions": []
 }

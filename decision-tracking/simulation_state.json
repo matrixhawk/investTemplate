@@ -3,7 +3,7 @@
   "engine_version": "V3.1",
   "initial_capital": 500000.0,
   "cash": 109160.0,
-  "last_trade_date": "2026-03-26",
+  "last_trade_date": "2026-06-08",
   "positions": {
     "1522.HK": {
       "name": "京投交通科技",
@@ -169,6 +169,72 @@
       "sell_trigger": 70.2,
       "target_buy": 52.0,
       "lot_size": 100,
+      "realized_pnl": 0.0
+    },
+    "000858.SZ": {
+      "name": "五粮液",
+      "code": "000858",
+      "ticker": "000858.SZ",
+      "shares": 0,
+      "avg_cost": 0.0,
+      "sell_trigger": 0.0,
+      "target_buy": null,
+      "lot_size": 100,
+      "realized_pnl": 0.0
+    },
+    "600529.SS": {
+      "name": "山东药玻",
+      "code": "600529",
+      "ticker": "600529.SS",
+      "shares": 0,
+      "avg_cost": 0.0,
+      "sell_trigger": 0.0,
+      "target_buy": null,
+      "lot_size": 100,
+      "realized_pnl": 0.0
+    },
+    "603345.SS": {
+      "name": "安井食品",
+      "code": "603345",
+      "ticker": "603345.SS",
+      "shares": 0,
+      "avg_cost": 0.0,
+      "sell_trigger": 0.0,
+      "target_buy": null,
+      "lot_size": 100,
+      "realized_pnl": 0.0
+    },
+    "3316.HK": {
+      "name": "滨江服务",
+      "code": "03316",
+      "ticker": "3316.HK",
+      "shares": 0,
+      "avg_cost": 0.0,
+      "sell_trigger": 0.0,
+      "target_buy": null,
+      "lot_size": 1000,
+      "realized_pnl": 0.0
+    },
+    "0506.HK": {
+      "name": "中国食品",
+      "code": "00506",
+      "ticker": "0506.HK",
+      "shares": 0,
+      "avg_cost": 0.0,
+      "sell_trigger": 0.0,
+      "target_buy": null,
+      "lot_size": 1000,
+      "realized_pnl": 0.0
+    },
+    "1405.HK": {
+      "name": "达势股份",
+      "code": "01405",
+      "ticker": "1405.HK",
+      "shares": 0,
+      "avg_cost": 0.0,
+      "sell_trigger": 0.0,
+      "target_buy": null,
+      "lot_size": 1000,
       "realized_pnl": 0.0
     }
   }
