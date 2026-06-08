@@ -71,6 +71,30 @@ VIX_SYMBOL = "^VIX"
 
 # ==================== 数据获取 ====================
 
+def get_vix_from_investing():
+    """从英为财情 investing.com 获取VIX数据（无需API key）"""
+    try:
+        url = 'https://cn.investing.com/indices/volatility-s-p-500'
+        req = urllib.request.Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        })
+        ctx = ssl.create_default_context()
+        with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
+            html = resp.read().decode('utf-8', errors='ignore')
+        m = __import__('re').search(r'data-test="instrument-price-last"[^>]*>([\d.]+)', html)
+        if m:
+            return {
+                'value': round(float(m.group(1)), 2),
+                'date': datetime.now().strftime('%Y-%m-%d'),
+                'source': 'investing.com'
+            }
+    except Exception as e:
+        print(f"[VIX] investing.com获取失败: {e}")
+    return None
+
+
 def get_vix_from_yfinance():
     """从yfinance获取VIX数据"""
     if not YFINANCE_AVAILABLE:
@@ -141,28 +165,117 @@ def get_etf_price_from_yfinance():
 
 def get_vix_data():
     """获取VIX数据，尝试多种数据源"""
+    # 1. investing.com（最可靠，不依赖yfinance）
+    result = get_vix_from_investing()
+    if result:
+        print(f"[VIX] 从investing.com获取: {result['value']} ({result['date']})")
+        return result['value']
+
+    # 2. yfinance（备用）
     result = get_vix_from_yfinance()
     if result:
         print(f"[VIX] 从yfinance获取: {result['value']} ({result['date']})")
         return result['value']
-    print("[VIX] 无法自动获取，请手动提供")
+
+    print("[VIX] 无法自动获取，请手动提供 --vix 参数")
     return None
 
 
 def get_etf_price(date_str=None):
     """获取ETF价格，尝试多种数据源"""
     target_date = date_str or datetime.now().strftime('%Y-%m-%d')
+
+    # 1. 新浪（国内访问最稳定）
+    result = get_etf_price_from_sina(target_date)
+    if result:
+        print(f"[ETF] 从新浪获取: {result['price']} ({result['date']})")
+        return result['price']
+
+    # 2. 腾讯
+    result = get_etf_price_from_tencent(target_date)
+    if result:
+        print(f"[ETF] 从腾讯获取: {result['price']} ({result['date']})")
+        return result['price']
+
+    # 3. 东方财富
+    result = get_etf_price_from_eastmoney(target_date)
+    if result:
+        print(f"[ETF] 从东方财富获取: {result['price']} ({result['date']})")
+        return result['price']
+
+    # 4. akshare
     result = get_etf_price_from_akshare(target_date)
     if result:
         print(f"[ETF] 从akshare获取: {result['price']} ({result['date']})")
         return result['price']
-    
+
+    # 5. yfinance (QQQ)
     yf_result = get_etf_price_from_yfinance()
     if yf_result:
         print(f"[ETF] yfinance QQQ参考: {yf_result['price']} (涨跌: {yf_result['change_pct']*100:.2f}%)")
-        print(f"[ETF] 注意：这是QQQ价格，不是51310的实际价格")
-    
+        print(f"[ETF] 注意：这是QQQ价格，不是513110的实际价格")
+
     print("[ETF] 无法自动获取513110的A股价格，请手动提供 --price 参数")
+    return None
+
+
+def get_etf_price_from_sina(date_str=None):
+    """从新浪获取ETF价格"""
+    try:
+        url = 'https://hq.sinajs.cn/list=sh513110'
+        req = urllib.request.Request(url, headers={'Referer': 'https://finance.sina.com.cn'})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = resp.read().decode('gbk', errors='ignore')
+        m = __import__('re').search(r'var hq_str_sh513110="([^"]+)"', data)
+        if m:
+            parts = m.group(1).split(',')
+            if len(parts) > 3 and parts[3]:
+                return {
+                    'price': round(float(parts[3]), 3),
+                    'date': parts[30] if len(parts) > 30 and parts[30] else (date_str or datetime.now().strftime('%Y-%m-%d')),
+                    'source': 'sina'
+                }
+    except Exception as e:
+        print(f"[ETF] 新浪获取失败: {e}")
+    return None
+
+
+def get_etf_price_from_tencent(date_str=None):
+    """从腾讯获取ETF价格"""
+    try:
+        url = 'https://qt.gtimg.cn/q=sh513110'
+        with urllib.request.urlopen(url, timeout=10) as resp:
+            data = resp.read().decode('gbk', errors='ignore')
+        m = __import__('re').search(r'v_sh513110="([^"]+)"', data)
+        if m:
+            parts = m.group(1).split('~')
+            if len(parts) > 3 and parts[3]:
+                return {
+                    'price': round(float(parts[3]), 3),
+                    'date': date_str or datetime.now().strftime('%Y-%m-%d'),
+                    'source': 'tencent'
+                }
+    except Exception as e:
+        print(f"[ETF] 腾讯获取失败: {e}")
+    return None
+
+
+def get_etf_price_from_eastmoney(date_str=None):
+    """从东方财富获取ETF价格"""
+    try:
+        url = 'https://push2.eastmoney.com/api/qt/stock/get?secid=1.513110&fields=f43,f57,f58,f60'
+        ctx = ssl.create_default_context()
+        with urllib.request.urlopen(url, timeout=10, context=ctx) as resp:
+            data = json.loads(resp.read().decode())
+        if data.get('data') and data['data'].get('f43'):
+            price = float(data['data']['f43']) / 1000
+            return {
+                'price': round(price, 3),
+                'date': date_str or datetime.now().strftime('%Y-%m-%d'),
+                'source': 'eastmoney'
+            }
+    except Exception as e:
+        print(f"[ETF] 东方财富获取失败: {e}")
     return None
 
 
@@ -192,6 +305,35 @@ def get_last_known_etf_price(state):
                 }
         except Exception:
             pass
+    return None
+
+
+def get_last_known_vix(state):
+    """Fallback: use last confirmed VIX from local state."""
+    try:
+        perf = state.get('daily_performance', {})
+        vix = float(perf.get('vix', 0))
+        if vix > 0:
+            return {
+                'value': round(vix, 2),
+                'source': 'state.daily_performance.vix',
+                'date': perf.get('date', 'unknown')
+            }
+    except Exception:
+        pass
+
+    # 从biweekly_vix_log获取
+    try:
+        vix_log = state.get('strategy_state', {}).get('biweekly_vix_log', [])
+        if vix_log:
+            last = vix_log[-1]
+            return {
+                'value': round(float(last['vix']), 2),
+                'source': 'biweekly_vix_log',
+                'date': last.get('date', 'unknown')
+            }
+    except Exception:
+        pass
     return None
 
 
@@ -1072,7 +1214,7 @@ def update_markdown_template(state, date_str, vix, price):
 
 ---
 
-*最后更新：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
+*最后更新：""" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + """*
 """
 
     with open(template_path, 'w', encoding='utf-8') as f:
@@ -1709,9 +1851,9 @@ def record_snapshot(date_str, vix, price, state, daily_pnl, note):
         writer = csv.writer(f)
         cash = float(acc.get('cash', 0) or 0)
         writer.writerow([
-            date_str, vix, price, pos['shares'], pos['market_value'],
-            cash, get_total_assets_value(state), pos['total_cost'],
-            pos['unrealized_pnl'], daily_pnl, pos['return_pct'], note
+            date_str, vix, price, pos['shares'], round(pos['market_value'], 2),
+            round(cash, 2), round(get_total_assets_value(state), 2), round(pos['total_cost'], 2),
+            round(pos['unrealized_pnl'], 2), round(daily_pnl, 2), pos['return_pct'], note
         ])
     print(f"[快照] 已记录 {date_str}")
 
@@ -1766,6 +1908,14 @@ def sync_to_public(state, dashboard):
                 dst.write(src.read())
         print(f"[同步] 已同步收益率曲线HTML到: {public_html}")
 
+    # 同步 daily_returns.csv 到 public（校验脚本要求）
+    if DAILY_RETURNS_FILE.exists():
+        public_returns = PUBLIC_DIR / "daily_returns.csv"
+        with open(DAILY_RETURNS_FILE, 'r', encoding='utf-8') as src:
+            with open(public_returns, 'w', encoding='utf-8') as dst:
+                dst.write(src.read())
+        print(f"[同步] 已同步 daily_returns.csv 到: {public_returns}")
+
     # 同步到 08-决策追踪 目录（数据一致性要求）
     if ALT_STRATEGY_DIR.exists():
         alt_state = ALT_STRATEGY_DIR / "state.json"
@@ -1806,6 +1956,19 @@ def sync_to_public(state, dashboard):
                     dst.write(src.read())
             print(f"[同步] 已同步收益率曲线HTML到: {alt_html}")
 
+        # 同步 state.json（校验脚本要求）
+        alt_state = ALT_STRATEGY_DIR / "state.json"
+        save_json(alt_state, state)
+        print(f"[同步] 已同步 state.json 到: {alt_state}")
+
+        # 同步 daily_snapshot.csv（校验脚本要求）
+        alt_snapshot = ALT_STRATEGY_DIR / "daily_snapshot.csv"
+        if SNAPSHOT_FILE.exists():
+            with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as src:
+                with open(alt_snapshot, 'w', encoding='utf-8') as dst:
+                    dst.write(src.read())
+            print(f"[同步] 已同步 daily_snapshot.csv 到: {alt_snapshot}")
+
 
 # ==================== 主程序 ====================
 
@@ -1844,8 +2007,13 @@ def main():
     else:
         vix = get_vix_data()
         if vix is None:
-            print("错误: 无法获取VIX数据，请使用 --vix 参数手动提供")
-            return 1
+            fallback = get_last_known_vix(state)
+            if fallback and not is_trading:
+                vix = fallback['value']
+                print(f"[VIX] 自动获取失败，非定投日改用上次VIX {vix} (来源: {fallback['source']})")
+            else:
+                print("错误: 无法获取VIX数据，请使用 --vix 参数手动提供")
+                return 1
 
     if args.price is not None:
         price = args.price

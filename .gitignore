@@ -3,7 +3,7 @@
 .vitepress/cache
 node_modules
 
-# 依赖
+# Dependencies
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
@@ -19,11 +19,11 @@ pnpm-lock.yaml
 .DS_Store
 Thumbs.db
 
-# 日志
+# Logs
 *.log
 npm-debug.log*
 
-# 本地环境
+# Local env
 .env
 .env.local
 
@@ -34,12 +34,18 @@ __pycache__/
 *.so
 .Python
 
-# 生成的数据文件
+# Generated data files
 *.csv
 *.xlsx
 
-# 但模拟组合的交易记录必须提交（作为真相源）
+# Required committed data files
+!decision-tracking/simulation_trades.csv
 !08-决策追踪/simulation_trades.csv
+!decision-tracking/vix_dca_strategy/daily_returns.csv
+!decision-tracking/vix_dca_strategy/daily_snapshot.csv
+!public/vix_strategy/daily_returns.csv
+!08-决策追踪/vix_dca_strategy/daily_returns.csv
+!08-决策追踪/vix_dca_strategy/daily_snapshot.csv
 
 # VIX定投策略的历史数据必须提交（CI校验与网页曲线依赖）
 !decision-tracking/vix_dca_strategy/daily_snapshot.csv
@@ -49,13 +55,14 @@ __pycache__/
 !public/vix_strategy/daily_returns.csv
 
 # 临时文件
+# Temporary files
 tmp/
 temp/
 
-# 工具快照目录
+# Tool snapshot directories
 .alma-snapshots/
 
-# AI/Agent 本地目录（不应提交）
+# Local AI/agent directories
 .agents/
 .claude/
 .codebuddy/
@@ -64,8 +71,8 @@ temp/
 .trae/
 .windsurf/
 
-# 本地技能/工具锁文件
+# Local skill/tool lock files
 skills-lock.json
 
-# 自动生成的备份文件
+# Generated backup files
 *.bak

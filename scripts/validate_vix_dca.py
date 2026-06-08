@@ -182,7 +182,7 @@ def check_daily_snapshot():
 
     snapshot_path = STRATEGY_DIR / "daily_snapshot.csv"
     if not snapshot_path.exists():
-        error(f"缺少必需文件: {snapshot_path.relative_to(ROOT)}")
+        error("daily_snapshot.csv 缺失，请确认该文件已生成并提交到仓库")
         return
 
     snap_rows = load_csv_rows(snapshot_path)
@@ -272,11 +272,34 @@ def check_returns_curve():
         ok("returns_curve.html rawData 与数据源一致")
 
 
+def check_public_daily_returns_sync():
+    """Ensure public daily_returns.csv is a byte-for-byte copy of the source."""
+    print("\n[Check] public/vix_strategy/daily_returns.csv sync")
+
+    main_path = STRATEGY_DIR / "daily_returns.csv"
+    public_path = PUBLIC_DIR / "daily_returns.csv"
+
+    if not public_path.exists():
+        error("public/vix_strategy/daily_returns.csv missing")
+        return
+
+    with open(main_path, 'r', encoding='utf-8') as f:
+        main_content = f.read()
+    with open(public_path, 'r', encoding='utf-8') as f:
+        public_content = f.read()
+
+    if main_content != public_content:
+        error("public/vix_strategy/daily_returns.csv is not synced with source daily_returns.csv")
+        return
+
+    ok("public/vix_strategy/daily_returns.csv synced")
+
+
 def check_alt_dir_sync():
     """校验5: decision-tracking/ 与 08-决策追踪/ 目录同步"""
     print("\n【校验5】decision-tracking/ ↔ 08-决策追踪/ 目录同步")
 
-    files_to_check = ['state.json', 'daily_snapshot.csv', 'dashboard_data.json']
+    files_to_check = ['state.json', 'daily_snapshot.csv', 'daily_returns.csv', 'dashboard_data.json']
     has_sync_issue = False
     for fname in files_to_check:
         main_path = STRATEGY_DIR / fname
@@ -338,6 +361,7 @@ def main():
     check_daily_returns()
     check_daily_snapshot()
     check_returns_curve()
+    check_public_daily_returns_sync()
     check_alt_dir_sync()
     check_capital_mode()
 
