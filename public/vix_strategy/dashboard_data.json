@@ -1,35 +1,35 @@
 {
   "strategy": "VIX定投策略_纳指100",
   "version": "V2.0",
-  "last_update": "2026-06-09",
+  "last_update": "2026-06-10",
   "account": {
     "initial_capital": 9700.0,
     "cash": 91603.51,
-    "total_assets": 11214.1
+    "total_assets": 10908.17
   },
   "position": {
     "etf_code": "513110",
     "etf_name": "纳斯达克100 ETF",
     "shares": 4566,
     "avg_cost": 2.123,
-    "current_price": 2.456,
-    "market_value": 11214.1,
+    "current_price": 2.389,
+    "market_value": 10908.17,
     "total_cost": 9695.02,
-    "unrealized_pnl": 1519.08,
-    "return_pct": 15.67
+    "unrealized_pnl": 1213.16,
+    "return_pct": 12.51
   },
   "performance": {
-    "total_pnl": 1519.08,
-    "total_return_pct": 15.61,
-    "daily_pnl": 406.37,
-    "vix": 18.06,
-    "date": "2026-06-09"
+    "total_pnl": 1213.16,
+    "total_return_pct": 12.46,
+    "daily_pnl": -305.92,
+    "vix": 21.06,
+    "date": "2026-06-10"
   },
   "schedule": {
     "frequency": "每双周周二",
     "last_trade_date": "2026-06-02",
     "next_trade_date": "2026-06-16",
-    "days_until_next": 7
+    "days_until_next": 6
   },
   "recent_trades": [
     {
@@ -79,6 +79,12 @@
     }
   ],
   "daily_snapshots": [
+    {
+      "date": "2026-06-10",
+      "price": 2.389,
+      "pnl": 1213.16,
+      "daily_pnl": -305.92
+    },
     {
       "date": "2026-06-09",
       "price": 2.456,
