@@ -80,6 +80,7 @@ export default defineConfig({
         collapsed: true,
         items: [
           { text: '🔥 监控概览（每日更新）', link: '/analysis-reports/监控概览' },
+          { text: '威高股份_01066_投资分析报告', link: '/analysis-reports/威高股份_01066_投资分析报告' },
           { text: '保利物业_06049_投资分析报告', link: '/analysis-reports/保利物业_06049_投资分析报告' },
           { text: '天津发展_00882_投资分析报告', link: '/analysis-reports/天津发展_00882_投资分析报告' },
           { text: '中国民航信息网络_00696_投资分析报告', link: '/analysis-reports/中国民航信息网络_00696_投资分析报告' },
