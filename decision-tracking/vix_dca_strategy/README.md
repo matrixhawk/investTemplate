@@ -174,7 +174,7 @@ A: 当日收盘价 × 持仓份额 - 投入成本 = 当日浮动盈亏。
 python scripts/update_vix_dca.py --date YYYY-MM-DD --vix XX.X --price XX.XX
 
 # 步骤2：同步到网页数据源（必须！）
-copy 08-决策追踪\vix_dca_strategy\dashboard_data.json public\vix_strategy\dashboard_data.json
+copy decision-tracking\vix_dca_strategy\dashboard_data.json public\vix_strategy\dashboard_data.json
 
 # 步骤3：更新网页展示页面（必须！）
 # 手动编辑 模拟持仓/VIX定投策略.md

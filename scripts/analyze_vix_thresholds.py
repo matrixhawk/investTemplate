@@ -15,7 +15,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT_DIR = ROOT / "05-策略框架" / "VIX-纳斯达克100定投策略"
+OUTPUT_DIR = ROOT / "strategy-framework" / "VIX-纳斯达克100定投策略"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 

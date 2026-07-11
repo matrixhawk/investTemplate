@@ -29,6 +29,14 @@ analysis_metadata:
   is_latest_full_year: true  # 是否是最新完整年度年报
   next_year_available: false  # 下一年度报告是否已发布（如已发布则当前数据过时）
 
+  # 估值数据时点（V5.5.23新增）
+  valuation_policy:
+    primary_method: "PE"  # PE/PB/DPU_FFO/MID_CYCLE/PS/PROBABILITY_WEIGHTED
+    pe_applicable: true
+    price_as_of: "2026-03-20"
+    fx_as_of: "2026-03-20"
+    ttm_period: "2025-04-01/2026-03-31"
+
   data_confidence_level: "S"  # 整体置信度 S/A/B/C/D
 
   # 时点检查（强制勾选）- 强化版
@@ -133,6 +141,29 @@ core_financial_data:
     page_number: 0
     report_period: "2025-12-31"  # 报表期
     confidence: "S"
+
+  # TTM数据（V5.5.23新增；PE适用时必须逐季度填写）
+  ttm_quarters:
+    - period: "2025Q2"
+      value: 0
+      source: ""
+      page_number: 0
+      confidence: "A"
+    - period: "2025Q3"
+      value: 0
+      source: ""
+      page_number: 0
+      confidence: "A"
+    - period: "2025Q4"
+      value: 0
+      source: ""
+      page_number: 0
+      confidence: "A"
+    - period: "2026Q1"
+      value: 0
+      source: ""
+      page_number: 0
+      confidence: "A"
   
   non_recurring_items:
     asset_impairment: 0  # 资产减值
@@ -197,6 +228,13 @@ core_financial_data:
       value: 0  # 自动计算
       display_value: ""
       confidence: "A"
+
+    maintenance_fcf:
+      formula: "operating_cash_flow - maintenance_capex_range"
+      low_value: 0
+      high_value: 0
+      estimate_basis: ""
+      confidence: "B"
     
     market_cap_ex_cash:
       formula: "market_cap - net_cash"
@@ -216,6 +254,21 @@ core_financial_data:
     pe_ratio:
       formula: "market_cap / net_profit_attributable"
       value: 0  # 自动计算
+      display_value: ""
+
+    static_pe:
+      formula: "market_cap / net_profit_attributable"
+      value: 0
+      display_value: ""
+
+    ttm_net_profit:
+      formula: "sum(ttm_quarters.value)"
+      value: 0
+      display_value: ""
+
+    ttm_pe:
+      formula: "market_cap / ttm_net_profit"
+      value: 0
       display_value: ""
     
     pb_ratio:

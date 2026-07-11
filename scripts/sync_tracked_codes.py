@@ -5,7 +5,7 @@
 
 用途：
 1. 扫描 analysis-reports/*_投资分析报告.md
-2. 提取港股5位代码，写入 07-标的追踪/tracked_codes.txt
+2. 提取港股5位代码，写入 stock-tracking/tracked_codes.txt
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_DIR = ROOT / "analysis-reports"
-OUT_FILE = ROOT / "07-标的追踪" / "tracked_codes.txt"
+OUT_FILE = ROOT / "stock-tracking" / "tracked_codes.txt"
 
 
 def collect_codes() -> list[str]:

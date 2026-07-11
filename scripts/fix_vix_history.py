@@ -12,7 +12,6 @@ ROOT = Path(__file__).resolve().parents[1]
 STRATEGY_DIR = ROOT / "decision-tracking" / "vix_dca_strategy"
 PUBLIC_DIR = ROOT / "public" / "vix_strategy"
 TEMPLATE_DIR = ROOT / "portfolio"
-ALT_STRATEGY_DIR = ROOT / "08-决策追踪" / "vix_dca_strategy"
 
 DAILY_RETURNS_FILE = STRATEGY_DIR / "daily_returns.csv"
 SNAPSHOT_FILE = STRATEGY_DIR / "daily_snapshot.csv"

@@ -1,0 +1,21 @@
+template:
+  id: "V5.5.23"
+  name: "规则统一版"
+  updated: "2026-07-11"
+  entrypoint: "analysis-template.md"
+  chapter_dir: "template/"
+  changelog: "docs/CHANGELOG.md"
+  archive_dir: "archive/templates/"
+
+policy:
+  valuation_source_of_truth: "template/06-估值与安全边际.md"
+  report_contract: "template/00-报告输出契约.md"
+  data_validation_schema: "config/data_validation_template.yaml"
+  data_validation_script: "scripts/validate_data.py"
+
+rules:
+  primary_framework_required: true
+  secondary_framework_optional: true
+  surface_pe_and_ttm_required_when_applicable: true
+  reported_fcf_and_maintenance_fcf_separate: true
+  position_limit_source: "template/07-决策流程与持仓管理.md"

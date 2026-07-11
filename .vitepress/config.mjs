@@ -31,80 +31,144 @@ export default defineConfig({
             { text: '总览', link: '/portfolio/' },
             { text: '持仓', link: '/portfolio/holdings' },
             { text: '今日操作', link: '/portfolio/daily-operations' },
-            { text: '决策记录', link: '/portfolio/decision-log' },
-            { text: '📈 VIX定投策略', link: '/portfolio/vix-dca-strategy' }
+            { text: '决策记录', link: '/portfolio/decision-log' }
+          ]
+        },
+        {
+          text: '📈 VIX定投策略',
+          collapsed: true,
+          items: [
+            { text: '策略详情', link: '/portfolio/vix-dca-strategy' }
           ]
         }
       ],
       '/': [
-      {
-        text: '📋 核心文档',
-        collapsed: false,
-        items: [
-          { text: '个股分析标准模版', link: '/analysis-template' },
-          { text: '🎯 模拟持仓（实时）', link: '/portfolio/holdings' },
-          { text: '项目介绍', link: '/README' },
-          { text: '项目结构说明', link: '/docs/project-structure' },
-          { text: '更新日志', link: '/docs/CHANGELOG' }
-        ]
-      },
-      {
-        text: '📋 分析模板',
-        collapsed: false,
-        items: [
-          { text: '01-数据核查与地缘政治排除', link: '/template/01-数据核查与地缘政治排除' },
-          { text: '02-央国企筛选与流派识别', link: '/template/02-央国企筛选与流派识别' },
-          { text: '03-深度负债与周期分析', link: '/template/03-深度负债与周期分析' },
-          { text: '04-动态现金与周期拐点', link: '/template/04-动态现金与周期拐点' },
-          { text: '05-极端情景测试', link: '/template/05-极端情景测试' },
-          { text: '06-估值与安全边际', link: '/template/06-估值与安全边际' },
-          { text: '07-决策流程与持仓管理', link: '/template/07-决策流程与持仓管理' },
-          { text: '08-高级烟蒂股分析框架', link: '/template/08-高级烟蒂股分析框架' },
-          { text: '09-估值修复框架', link: '/template/09-估值修复框架' },
-          { text: '10-特殊轻资产模式', link: '/template/10-特殊轻资产模式' },
-          { text: '12-扩张期消费品牌分析框架', link: '/template/12-扩张期消费品牌分析框架' },
-          { text: '13-消费分层与AI时代防御框架', link: '/template/13-消费分层与AI时代防御框架' },
-          { text: '11-ST套利与特殊事件策略', link: '/template/11-ST套利与特殊事件策略' }
-        ]
-      },
-      {
-        text: '📚 项目文档',
-        collapsed: true,
-        items: [
-          { text: '更新日志', link: '/docs/CHANGELOG' },
-          { text: '项目结构说明', link: '/docs/project-structure' }
-        ]
-      },
-      {
-        text: '📈 个股分析报告',
-        collapsed: true,
-        items: [
-          { text: '🔥 监控概览（每日更新）', link: '/analysis-reports/监控概览' },
-          { text: '威高股份_01066_投资分析报告', link: '/analysis-reports/威高股份_01066_投资分析报告' },
-          { text: '保利物业_06049_投资分析报告', link: '/analysis-reports/保利物业_06049_投资分析报告' },
-          { text: '天津发展_00882_投资分析报告', link: '/analysis-reports/天津发展_00882_投资分析报告' },
-          { text: '中国民航信息网络_00696_投资分析报告', link: '/analysis-reports/中国民航信息网络_00696_投资分析报告' },
-          { text: '金融街物业_01502_投资分析报告', link: '/analysis-reports/金融街物业_01502_投资分析报告' },
-          { text: '中海物业_02669_投资分析报告', link: '/analysis-reports/中海物业_02669_投资分析报告' },
-          { text: '汇贤产业信托_87001_投资分析报告', link: '/analysis-reports/汇贤产业信托_87001_投资分析报告' },
-          { text: '蒙牛乳业_02319_投资分析报告', link: '/analysis-reports/蒙牛乳业_02319_投资分析报告' },
-          { text: '海底捞_06862_投资分析报告', link: '/analysis-reports/海底捞_06862_投资分析报告' },
-          { text: '京投交通科技_01522_投资分析报告', link: '/analysis-reports/京投交通科技_01522_投资分析报告' },
-          { text: '绿城服务_02869_投资分析报告', link: '/analysis-reports/绿城服务_02869_投资分析报告' },
-          { text: '同仁堂国药_03613_投资分析报告', link: '/analysis-reports/同仁堂国药_03613_投资分析报告' },
-          { text: '牧原股份_002714_投资分析报告', link: '/analysis-reports/牧原股份_002714_投资分析报告' },
-          { text: '分众传媒_002027_投资分析报告', link: '/analysis-reports/分众传媒_002027_投资分析报告' },
-          { text: '青岛啤酒_600600_投资分析报告', link: '/analysis-reports/青岛啤酒_600600_投资分析报告' },
-          { text: '华润医药_03320_投资分析报告', link: '/analysis-reports/华润医药_03320_投资分析报告' },
-          { text: '中国食品_00506_投资分析报告', link: '/analysis-reports/中国食品_00506_投资分析报告' },
-          { text: '达势股份_01405_投资分析报告', link: '/analysis-reports/达势股份_01405_投资分析报告' },
-          { text: '山东药玻_600529_投资分析报告', link: '/analysis-reports/山东药玻_600529_投资分析报告' },
-          { text: '五粮液_000858_投资分析报告', link: '/analysis-reports/五粮液_000858_投资分析报告' },
-          { text: '安井食品_603345_投资分析报告', link: '/analysis-reports/安井食品_603345_投资分析报告' },
-          { text: '滨江服务_03316_投资分析报告', link: '/analysis-reports/滨江服务_03316_投资分析报告' },
-          { text: '神威药业_02877_投资分析报告', link: '/analysis-reports/神威药业_02877_投资分析报告' }
-        ]
-      }
+        {
+          text: '🏠 首页',
+          collapsed: false,
+          items: [
+            { text: '项目首页', link: '/' },
+            { text: '项目介绍', link: '/README' }
+          ]
+        },
+        {
+          text: '📋 投资分析模板',
+          collapsed: false,
+          items: [
+            { text: '个股分析标准模版', link: '/analysis-template' },
+            { text: '00-报告输出契约', link: '/template/00-报告输出契约' },
+            { text: '01-数据核查与地缘政治排除', link: '/template/01-数据核查与地缘政治排除' },
+            { text: '02-央国企筛选与流派识别', link: '/template/02-央国企筛选与流派识别' },
+            { text: '03-深度负债与周期分析', link: '/template/03-深度负债与周期分析' },
+            { text: '04-动态现金与周期拐点', link: '/template/04-动态现金与周期拐点' },
+            { text: '05-极端情景测试', link: '/template/05-极端情景测试' },
+            { text: '06-估值与安全边际', link: '/template/06-估值与安全边际' },
+            { text: '07-决策流程与持仓管理', link: '/template/07-决策流程与持仓管理' },
+            { text: '08-高级烟蒂股分析框架', link: '/template/08-高级烟蒂股分析框架' },
+            { text: '09-估值修复框架', link: '/template/09-估值修复框架' },
+            { text: '10-特殊轻资产模式', link: '/template/10-特殊轻资产模式' },
+            { text: '11-ST套利与特殊事件策略', link: '/template/11-ST套利与特殊事件策略' },
+            { text: '11-ST重组策略', link: '/template/11-ST重组策略' },
+            { text: '12-扩张期消费品牌分析框架', link: '/template/12-扩张期消费品牌分析框架' },
+            { text: '13-消费分层与AI时代防御框架', link: '/template/13-消费分层与AI时代防御框架' }
+          ]
+        },
+        {
+          text: '📈 个股分析报告',
+          collapsed: true,
+          items: [
+            { text: '报告目录', link: '/analysis-reports/' },
+            { text: '🔥 监控概览（每日更新）', link: '/analysis-reports/监控概览' },
+            {
+              text: '🏢 物业服务（港股）',
+              collapsed: true,
+              items: [
+                { text: '保利物业_06049', link: '/analysis-reports/保利物业_06049_投资分析报告' },
+                { text: '中海物业_02669', link: '/analysis-reports/中海物业_02669_投资分析报告' },
+                { text: '金融街物业_01502', link: '/analysis-reports/金融街物业_01502_投资分析报告' },
+                { text: '滨江服务_03316', link: '/analysis-reports/滨江服务_03316_投资分析报告' },
+                { text: '绿城服务_02869', link: '/analysis-reports/绿城服务_02869_投资分析报告' }
+              ]
+            },
+            {
+              text: '💊 医药医疗（港股）',
+              collapsed: true,
+              items: [
+                { text: '威高股份_01066', link: '/analysis-reports/威高股份_01066_投资分析报告' },
+                { text: '同仁堂国药_03613', link: '/analysis-reports/同仁堂国药_03613_投资分析报告' },
+                { text: '神威药业_02877', link: '/analysis-reports/神威药业_02877_投资分析报告' },
+                { text: '华润医药_03320', link: '/analysis-reports/华润医药_03320_投资分析报告' }
+              ]
+            },
+            {
+              text: '🍽️ 消费食品（港股）',
+              collapsed: true,
+              items: [
+                { text: '中国食品_00506', link: '/analysis-reports/中国食品_00506_投资分析报告' },
+                { text: '蒙牛乳业_02319', link: '/analysis-reports/蒙牛乳业_02319_投资分析报告' },
+                { text: '海底捞_06862', link: '/analysis-reports/海底捞_06862_投资分析报告' },
+                { text: '达势股份_01405', link: '/analysis-reports/达势股份_01405_投资分析报告' }
+              ]
+            },
+            {
+              text: '🏛️ 控股平台/REITs（港股）',
+              collapsed: true,
+              items: [
+                { text: '天津发展_00882', link: '/analysis-reports/天津发展_00882_投资分析报告' },
+                { text: '汇贤产业信托_87001', link: '/analysis-reports/汇贤产业信托_87001_投资分析报告' }
+              ]
+            },
+            {
+              text: '🚇 其他行业（港股）',
+              collapsed: true,
+              items: [
+                { text: '中国民航信息网络_00696', link: '/analysis-reports/中国民航信息网络_00696_投资分析报告' },
+                { text: '京投交通科技_01522', link: '/analysis-reports/京投交通科技_01522_投资分析报告' }
+              ]
+            },
+            {
+              text: '📈 A股分析报告',
+              collapsed: true,
+              items: [
+                { text: '五粮液_000858', link: '/analysis-reports/五粮液_000858_投资分析报告' },
+                { text: '分众传媒_002027', link: '/analysis-reports/分众传媒_002027_投资分析报告' },
+                { text: '青岛啤酒_600600', link: '/analysis-reports/青岛啤酒_600600_投资分析报告' },
+                { text: '山东药玻_600529', link: '/analysis-reports/山东药玻_600529_投资分析报告' },
+                { text: '安井食品_603345', link: '/analysis-reports/安井食品_603345_投资分析报告' },
+                { text: '牧原股份_002714', link: '/analysis-reports/牧原股份_002714_投资分析报告' }
+              ]
+            }
+          ]
+        },
+        {
+          text: '🎯 模拟持仓',
+          collapsed: true,
+          items: [
+            { text: '持仓总览', link: '/portfolio/' },
+            { text: '持仓详情', link: '/portfolio/holdings' },
+            { text: '今日操作', link: '/portfolio/daily-operations' },
+            { text: '决策记录', link: '/portfolio/decision-log' }
+          ]
+        },
+        {
+          text: '📊 VIX定投策略',
+          collapsed: true,
+          items: [
+            { text: '策略详情', link: '/portfolio/vix-dca-strategy' }
+          ]
+        },
+        {
+          text: '📚 项目文档',
+          collapsed: true,
+          items: [
+            { text: '更新日志', link: '/docs/CHANGELOG' },
+            { text: '项目结构说明', link: '/docs/project-structure' },
+            { text: '项目概述', link: '/docs/agents/00-INDEX' },
+            { text: '开发规范', link: '/docs/agents/02-dev-guidelines' },
+            { text: '投资理论', link: '/docs/agents/04-investment-theory' },
+            { text: '数据质量控制', link: '/docs/agents/05-data-quality' }
+          ]
+        }
       ]
     },
     

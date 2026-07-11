@@ -1,17 +1,17 @@
 {
   "meta": {
-    "template_version": "V5.5.12",
-    "engine_version": "V3.1",
-    "generated_at": "2026-06-08 12:44:47",
-    "latest_trade_date": "2026-06-08"
+    "template_version": "V5.5.22",
+    "engine_version": "V4.0",
+    "generated_at": "2026-07-11 21:09:28",
+    "latest_trade_date": "2026-07-11"
   },
   "portfolio": {
     "initial_capital": 500000.0,
-    "cash": 109160.0,
-    "market_value": 360170.01,
-    "net_value": 469330.01,
-    "total_return_pct": -6.134,
-    "position_ratio_pct": 72.034,
+    "cash": 104660.0,
+    "market_value": 334732.0,
+    "net_value": 439392.0,
+    "total_return_pct": -12.1216,
+    "position_ratio_pct": 66.9464,
     "positions": [
       {
         "name": "天津发展",
@@ -19,12 +19,12 @@
         "ticker": "0882.HK",
         "shares": 40000,
         "avg_cost": 2.55,
-        "close": 2.13,
-        "change_pct": -4.0541,
-        "market_value": 85200.0,
-        "unrealized": -16800.0,
+        "close": 2.09,
+        "change_pct": 0.9662,
+        "market_value": 83600.0,
+        "unrealized": -18400.0,
         "sell_trigger": 4.5,
-        "weight_pct": 18.1535,
+        "weight_pct": 19.0263,
         "status": "实时"
       },
       {
@@ -33,26 +33,26 @@
         "ticker": "1522.HK",
         "shares": 342000,
         "avg_cost": 0.295,
-        "close": 0.285,
-        "change_pct": 0.0,
-        "market_value": 97470.0,
-        "unrealized": -3420.0,
+        "close": 0.246,
+        "change_pct": -1.6,
+        "market_value": 84132.0,
+        "unrealized": -16758.0,
         "sell_trigger": 0.6,
-        "weight_pct": 20.7679,
+        "weight_pct": 19.1474,
         "status": "实时"
       },
       {
         "name": "华润医药",
         "code": "03320",
         "ticker": "3320.HK",
-        "shares": 15000,
-        "avg_cost": 5.33,
-        "close": 4.75,
-        "change_pct": 0.4228,
-        "market_value": 71250.0,
-        "unrealized": -8700.0,
+        "shares": 16000,
+        "avg_cost": 5.278125,
+        "close": 4.5,
+        "change_pct": 1.3514,
+        "market_value": 72000.0,
+        "unrealized": -12450.0,
         "sell_trigger": 9.0,
-        "weight_pct": 15.1812,
+        "weight_pct": 16.3863,
         "status": "实时"
       },
       {
@@ -61,15 +61,122 @@
         "ticker": "87001.HK",
         "shares": 250000,
         "avg_cost": 0.432,
-        "close": 0.425,
+        "close": 0.38,
         "change_pct": 0.0,
-        "market_value": 106250.0,
-        "unrealized": -1750.0,
+        "market_value": 95000.0,
+        "unrealized": -13000.0,
         "sell_trigger": 1.0,
-        "weight_pct": 22.6387,
+        "weight_pct": 21.6208,
         "status": "实时"
       }
     ]
   },
-  "today_actions": []
+  "today_actions": [],
+  "recent_actions": [
+    {
+      "date": "2026-03-26",
+      "ticker": "1522.HK",
+      "name": "京投交通科技",
+      "action": "INIT_BUY",
+      "price": 0.295,
+      "shares": 342000,
+      "amount": 100890.0,
+      "reason": "🐢🍊极品：净现金>市值（101%），PB 0.25倍，股息率6.5-7.4%，央企控股，风险极低"
+    },
+    {
+      "date": "2026-03-26",
+      "ticker": "87001.HK",
+      "name": "汇贤产业信托",
+      "action": "INIT_BUY",
+      "price": 0.432,
+      "shares": 250000,
+      "amount": 108000.0,
+      "reason": "🐢🍊极品：真实盈利/市值38%，2年后分红率20%+，低估值高分红REIT"
+    },
+    {
+      "date": "2026-03-26",
+      "ticker": "0882.HK",
+      "name": "天津发展",
+      "action": "INIT_BUY",
+      "price": 2.55,
+      "shares": 40000,
+      "amount": 102000.0,
+      "reason": "🐢🍊金龟：PB 0.21倍，SOTP折价60%，股息率5.6%，央企控股平台"
+    },
+    {
+      "date": "2026-03-26",
+      "ticker": "3320.HK",
+      "name": "华润医药",
+      "action": "INIT_BUY",
+      "price": 5.33,
+      "shares": 15000,
+      "amount": 79950.0,
+      "reason": "🐢🍊低估：剔除净现金PE 3.6倍，PB 0.63倍，净现金200亿，央企医药平台（卫星仓位）"
+    },
+    {
+      "date": "2026-07-10",
+      "ticker": "3320.HK",
+      "name": "华润医药",
+      "action": "BUY_ADD",
+      "price": 4.5,
+      "shares": 1000,
+      "amount": 4500.0,
+      "reason": "触发回撤5%加仓：当前价4.50低于成本价5.28的95%（5.01），按策略自动加仓"
+    }
+  ],
+  "grouped_trades": {
+    "2026-07-10": [
+      {
+        "ticker": "3320.HK",
+        "name": "华润医药",
+        "action": "BUY_ADD",
+        "price": 4.5,
+        "shares": 1000,
+        "amount": 4500.0,
+        "reason": "触发回撤5%加仓：当前价4.50低于成本价5.28的95%（5.01），按策略自动加仓"
+      }
+    ],
+    "2026-03-26": [
+      {
+        "ticker": "1522.HK",
+        "name": "京投交通科技",
+        "action": "INIT_BUY",
+        "price": 0.295,
+        "shares": 342000,
+        "amount": 100890.0,
+        "reason": "🐢🍊极品：净现金>市值（101%），PB 0.25倍，股息率6.5-7.4%，央企控股，风险极低"
+      },
+      {
+        "ticker": "87001.HK",
+        "name": "汇贤产业信托",
+        "action": "INIT_BUY",
+        "price": 0.432,
+        "shares": 250000,
+        "amount": 108000.0,
+        "reason": "🐢🍊极品：真实盈利/市值38%，2年后分红率20%+，低估值高分红REIT"
+      },
+      {
+        "ticker": "0882.HK",
+        "name": "天津发展",
+        "action": "INIT_BUY",
+        "price": 2.55,
+        "shares": 40000,
+        "amount": 102000.0,
+        "reason": "🐢🍊金龟：PB 0.21倍，SOTP折价60%，股息率5.6%，央企控股平台"
+      },
+      {
+        "ticker": "3320.HK",
+        "name": "华润医药",
+        "action": "INIT_BUY",
+        "price": 5.33,
+        "shares": 15000,
+        "amount": 79950.0,
+        "reason": "🐢🍊低估：剔除净现金PE 3.6倍，PB 0.63倍，净现金200亿，央企医药平台（卫星仓位）"
+      }
+    ]
+  },
+  "ai_summary": {
+    "ai_decisions_today": 0,
+    "rule_decisions_today": 0
+  }
 }

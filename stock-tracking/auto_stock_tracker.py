@@ -22,7 +22,7 @@ import yfinance as yf
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REPORT_DIR = ROOT / "07-分析输出"
+REPORT_DIR = ROOT / "analysis-reports"
 OUTPUT_DIR = Path(__file__).resolve().parent / "stock_data"
 TRACKED_CODES_FILE = Path(__file__).resolve().parent / "tracked_codes.txt"
 

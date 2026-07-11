@@ -17,6 +17,16 @@ const showHome = computed(() => props.mode === 'home')
 const showPositions = computed(() => props.mode === 'positions')
 const showToday = computed(() => props.mode === 'today')
 const showDecisions = computed(() => props.mode === 'decisions')
+const groupedTradeList = computed(() => {
+  const grouped = data.value?.grouped_trades || {}
+  return Object.entries(grouped)
+    .sort(([a], [b]) => new Date(b) - new Date(a))
+    .map(([date, trades]) => ({
+      date,
+      trades,
+      count: trades.length
+    }))
+})
 const showFullHeader = computed(() => showHome.value)
 const investedCost = computed(() => {
   const list = positions.value || []
@@ -57,6 +67,9 @@ const actionLabel = (a) => {
 }
 
 const todayHasAction = computed(() => (data.value?.today_actions || []).length > 0)
+const recentActionsSorted = computed(() => {
+  return [...(data.value?.recent_actions || [])].sort((a, b) => new Date(b.date) - new Date(a.date))
+})
 const positions = computed(() => data.value?.portfolio?.positions || [])
 const decisionRows = computed(() => data.value?.ai_decisions?.table_rows || [])
 const decisionGroups = computed(() => {
@@ -285,7 +298,7 @@ onBeforeUnmount(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(a, idx) in data.recent_actions" :key="`recent-${a.date}-${a.ticker}-${idx}`">
+            <tr v-for="(a, idx) in recentActionsSorted" :key="`recent-${a.date}-${a.ticker}-${idx}`">
               <td>{{ a.date }}</td>
               <td>{{ a.name }}</td>
               <td>{{ actionLabel(a.action) }}</td>
@@ -299,70 +312,28 @@ onBeforeUnmount(() => {
       </section>
 
       <section v-if="showDecisions" class="dd-panel">
-        <h3>AI决策记录（只读）</h3>
-        <div v-if="decisionRows.length > 0" class="decision-stream">
-          <div class="decision-group group-green">
-            <h4>🟢 正向建议</h4>
-            <div v-if="decisionGroups.green.length === 0" class="dd-empty">暂无</div>
-            <div v-else class="decision-cards">
-              <article v-for="(r, idx) in decisionGroups.green" :key="`g-${idx}`" class="decision-card card-green">
+        <h3>交易决策记录</h3>
+        <div v-if="groupedTradeList.length > 0" class="decision-stream">
+          <div v-for="group in groupedTradeList" :key="group.date" class="decision-group group-date">
+            <h4>{{ group.date }} <span class="date-count">{{ group.count }}笔</span></h4>
+            <div class="decision-cards">
+              <article v-for="(t, idx) in group.trades" :key="`${group.date}-${idx}`" class="decision-card">
                 <div class="card-top">
-                  <span class="name">{{ r.name }}</span>
-                  <span class="status">{{ r.status || '🟢' }}</span>
+                  <span class="action-tag" :class="t.action.toLowerCase()">{{ actionLabel(t.action) }}</span>
+                  <span class="name">{{ t.name }}</span>
                 </div>
-                <div class="card-meta">{{ r.date }} · {{ r.code }} · {{ r.action }}</div>
+                <div class="card-meta">{{ t.code }} · {{ t.ticker }}</div>
                 <div class="card-row">
-                  <span>建议价：{{ r.suggest_price || '-' }}</span>
-                  <span>当前价：{{ r.current_price || '-' }}</span>
+                  <span>价格：{{ Number(t.price).toFixed(3) }}</span>
+                  <span>股数：{{ Number(t.shares).toLocaleString('zh-CN') }}</span>
+                  <span>金额：{{ money(t.amount) }}</span>
                 </div>
-                <div class="card-reason">{{ r.reason || '-' }}</div>
-              </article>
-            </div>
-          </div>
-
-          <div class="decision-group group-yellow">
-            <h4>🟡 观察待验证</h4>
-            <div v-if="decisionGroups.yellow.length === 0" class="dd-empty">暂无</div>
-            <div v-else class="decision-cards">
-              <article v-for="(r, idx) in decisionGroups.yellow" :key="`y-${idx}`" class="decision-card card-yellow">
-                <div class="card-top">
-                  <span class="name">{{ r.name }}</span>
-                  <span class="status">{{ r.status || '🟡' }}</span>
-                </div>
-                <div class="card-meta">{{ r.date }} · {{ r.code }} · {{ r.action }}</div>
-                <div class="card-row">
-                  <span>建议价：{{ r.suggest_price || '-' }}</span>
-                  <span>当前价：{{ r.current_price || '-' }}</span>
-                </div>
-                <div class="card-reason">{{ r.reason || '-' }}</div>
-              </article>
-            </div>
-          </div>
-
-          <div class="decision-group group-red">
-            <h4>🔴 风险与回避</h4>
-            <div v-if="decisionGroups.red.length === 0" class="dd-empty">暂无</div>
-            <div v-else class="decision-cards">
-              <article v-for="(r, idx) in decisionGroups.red" :key="`r-${idx}`" class="decision-card card-red">
-                <div class="card-top">
-                  <span class="name">{{ r.name }}</span>
-                  <span class="status">{{ r.status || '🔴' }}</span>
-                </div>
-                <div class="card-meta">{{ r.date }} · {{ r.code }} · {{ r.action }}</div>
-                <div class="card-row">
-                  <span>建议价：{{ r.suggest_price || '-' }}</span>
-                  <span>当前价：{{ r.current_price || '-' }}</span>
-                </div>
-                <div class="card-reason">{{ r.reason || '-' }}</div>
+                <div class="card-reason">{{ t.reason || '-' }}</div>
               </article>
             </div>
           </div>
         </div>
-        <div v-else class="dd-empty">未解析到标准决策表格，下面展示原文摘要。</div>
-        <details class="dd-details">
-          <summary>查看原文摘要</summary>
-          <pre class="dd-raw">{{ data.ai_decisions.raw_excerpt }}</pre>
-        </details>
+        <div v-else class="dd-empty">暂无交易记录。</div>
       </section>
     </template>
   </div>

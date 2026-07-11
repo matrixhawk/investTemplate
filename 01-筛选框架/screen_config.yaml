@@ -1,0 +1,41 @@
+screen_strategies:
+  net_cash:
+    name: 净现金股
+    description: 净现金 > 市值，真正的烟蒂股
+    filters:
+      min_net_cash_to_market_ratio: 1.0
+      max_pe: 15
+
+  cigar_butt:
+    name: 烟蒂股
+    description: PB极低，资产支持价值
+    filters:
+      max_pb: 0.5
+      min_market_cap: 500
+      max_pe: 20
+
+  high_dividend:
+    name: 高股息
+    description: 高股息率，稳定现金流
+    filters:
+      min_dividend_yield: 5.0
+      min_dividend_consistency: 3
+      max_pe: 12
+
+  undervalued:
+    name: 低估股
+    description: PE低，基本面稳健
+    filters:
+      max_pe: 8
+      min_roe: 5.0
+      min_market_cap: 1000
+
+exclusions:
+  - ST
+  - "*ST"
+  - 停牌
+  - 退市
+
+output:
+  top_n: 20
+  format: csv

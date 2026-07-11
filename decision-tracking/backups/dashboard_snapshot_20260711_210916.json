@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "template_version": "V5.5.22",
+    "engine_version": "V4.0",
+    "generated_at": "2026-07-11 21:03:08",
+    "latest_trade_date": "2026-07-11"
+  },
+  "portfolio": {
+    "initial_capital": 500000.0,
+    "cash": 104660.0,
+    "market_value": 334732.0,
+    "net_value": 439392.0,
+    "total_return_pct": -12.1216,
+    "position_ratio_pct": 66.9464,
+    "positions": [
+      {
+        "name": "天津发展",
+        "code": "00882",
+        "ticker": "0882.HK",
+        "shares": 40000,
+        "avg_cost": 2.55,
+        "close": 2.09,
+        "change_pct": 0.9662,
+        "market_value": 83600.0,
+        "unrealized": -18400.0,
+        "sell_trigger": 4.5,
+        "weight_pct": 19.0263,
+        "status": "实时"
+      },
+      {
+        "name": "京投交通科技",
+        "code": "01522",
+        "ticker": "1522.HK",
+        "shares": 342000,
+        "avg_cost": 0.295,
+        "close": 0.246,
+        "change_pct": -1.6,
+        "market_value": 84132.0,
+        "unrealized": -16758.0,
+        "sell_trigger": 0.6,
+        "weight_pct": 19.1474,
+        "status": "实时"
+      },
+      {
+        "name": "华润医药",
+        "code": "03320",
+        "ticker": "3320.HK",
+        "shares": 16000,
+        "avg_cost": 5.278125,
+        "close": 4.5,
+        "change_pct": 1.3514,
+        "market_value": 72000.0,
+        "unrealized": -12450.0,
+        "sell_trigger": 9.0,
+        "weight_pct": 16.3863,
+        "status": "实时"
+      },
+      {
+        "name": "汇贤产业信托",
+        "code": "87001",
+        "ticker": "87001.HK",
+        "shares": 250000,
+        "avg_cost": 0.432,
+        "close": 0.38,
+        "change_pct": 0.0,
+        "market_value": 95000.0,
+        "unrealized": -13000.0,
+        "sell_trigger": 1.0,
+        "weight_pct": 21.6208,
+        "status": "实时"
+      }
+    ]
+  },
+  "today_actions": [],
+  "recent_actions": [
+    {
+      "date": "2026-03-26",
+      "ticker": "1522.HK",
+      "name": "京投交通科技",
+      "action": "INIT_BUY",
+      "price": 0.295,
+      "shares": 342000,
+      "amount": 100890.0,
+      "reason": "初始建仓（3月26日收盘价）"
+    },
+    {
+      "date": "2026-03-26",
+      "ticker": "87001.HK",
+      "name": "汇贤产业信托",
+      "action": "INIT_BUY",
+      "price": 0.432,
+      "shares": 250000,
+      "amount": 108000.0,
+      "reason": "初始建仓（3月26日收盘价）"
+    },
+    {
+      "date": "2026-03-26",
+      "ticker": "0882.HK",
+      "name": "天津发展",
+      "action": "INIT_BUY",
+      "price": 2.55,
+      "shares": 40000,
+      "amount": 102000.0,
+      "reason": "初始建仓（3月26日收盘价）"
+    },
+    {
+      "date": "2026-03-26",
+      "ticker": "3320.HK",
+      "name": "华润医药",
+      "action": "INIT_BUY",
+      "price": 5.33,
+      "shares": 15000,
+      "amount": 79950.0,
+      "reason": "初始建仓（3月26日收盘价）"
+    },
+    {
+      "date": "2026-07-10",
+      "ticker": "3320.HK",
+      "name": "华润医药",
+      "action": "BUY_ADD",
+      "price": 4.5,
+      "shares": 1000,
+      "amount": 4500.0,
+      "reason": "触发回撤5%加仓"
+    }
+  ],
+  "grouped_trades": {
+    "2026-07-10": [
+      {
+        "ticker": "3320.HK",
+        "name": "华润医药",
+        "action": "BUY_ADD",
+        "price": 4.5,
+        "shares": 1000,
+        "amount": 4500.0,
+        "reason": "触发回撤5%加仓"
+      }
+    ],
+    "2026-03-26": [
+      {
+        "ticker": "1522.HK",
+        "name": "京投交通科技",
+        "action": "INIT_BUY",
+        "price": 0.295,
+        "shares": 342000,
+        "amount": 100890.0,
+        "reason": "初始建仓（3月26日收盘价）"
+      },
+      {
+        "ticker": "87001.HK",
+        "name": "汇贤产业信托",
+        "action": "INIT_BUY",
+        "price": 0.432,
+        "shares": 250000,
+        "amount": 108000.0,
+        "reason": "初始建仓（3月26日收盘价）"
+      },
+      {
+        "ticker": "0882.HK",
+        "name": "天津发展",
+        "action": "INIT_BUY",
+        "price": 2.55,
+        "shares": 40000,
+        "amount": 102000.0,
+        "reason": "初始建仓（3月26日收盘价）"
+      },
+      {
+        "ticker": "3320.HK",
+        "name": "华润医药",
+        "action": "INIT_BUY",
+        "price": 5.33,
+        "shares": 15000,
+        "amount": 79950.0,
+        "reason": "初始建仓（3月26日收盘价）"
+      }
+    ]
+  },
+  "ai_summary": {
+    "ai_decisions_today": 0,
+    "rule_decisions_today": 0
+  }
+}

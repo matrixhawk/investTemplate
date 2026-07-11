@@ -87,34 +87,56 @@ def validate_init_trades(trades: list[dict]) -> list[str]:
 def validate_state_trades_consistency(state: dict, trades: list[dict]) -> list[str]:
     errors = []
     positions = state.get("positions", {})
-    init_trades = [t for t in trades if t.get("action") == "INIT_BUY"]
     
-    for row in init_trades:
-        ticker = row["ticker"]
-        trade_price = float(row["price"])
-        trade_shares = int(row["shares"])
-        trade_code = str(row["code"])
-        
-        if ticker not in positions:
-            errors.append("持仓缺失: %s 有交易记录但不在state中" % ticker)
-            continue
-        
-        pos = positions[ticker]
-        state_price = float(pos.get("avg_cost", 0))
+    for ticker, pos in positions.items():
         state_shares = int(pos.get("shares", 0))
+        state_price = float(pos.get("avg_cost", 0))
         state_code = str(pos.get("code", ""))
         
-        if abs(state_price - trade_price) > 0.01:
+        if state_shares <= 0:
+            continue
+        
+        ticker_trades = [t for t in trades if t.get("ticker") == ticker]
+        if not ticker_trades:
+            errors.append("持仓缺失交易记录: %s" % ticker)
+            continue
+        
+        total_shares = 0
+        total_amount = 0.0
+        
+        buy_actions = {"INIT_BUY", "BUY_OPEN", "BUY_ADD"}
+        sell_actions = {"SELL", "SELL_CLOSE"}
+        
+        for t in ticker_trades:
+            action = t.get("action", "")
+            shares = int(t.get("shares", 0))
+            amount = float(t.get("amount", 0))
+            
+            if action in buy_actions:
+                total_shares += shares
+                total_amount += amount
+            elif action in sell_actions:
+                total_shares -= shares
+                total_amount -= shares * float(t.get("price", 0))
+        
+        expected_shares = total_shares
+        
+        if state_shares != expected_shares:
             errors.append(
-                "成本价不一致: %s state=%.3f, trades=%.3f" % (ticker, state_price, trade_price)
+                "持股数不一致: %s state=%d, trades累计=%d" % (ticker, state_shares, expected_shares)
             )
         
-        if state_shares != trade_shares:
-            errors.append(
-                "持股数不一致: %s state=%d, trades=%d" % (ticker, state_shares, trade_shares)
-            )
+        if total_shares > 0:
+            expected_price = total_amount / total_shares
+            if abs(state_price - expected_price) > 0.01:
+                errors.append(
+                    "成本价不一致: %s state=%.3f, trades计算=%.3f" % (ticker, state_price, expected_price)
+                )
         
-        if state_code != trade_code:
+        first_trade = ticker_trades[0]
+        trade_code = str(first_trade.get("code", ""))
+        
+        if state_code.lstrip("0") != trade_code.lstrip("0"):
             errors.append(
                 "code不一致: %s state=%s, trades=%s" % (ticker, state_code, trade_code)
             )

@@ -30,7 +30,7 @@ except Exception:
 
 # 路径配置
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT_DIR = ROOT / "05-策略框架" / "VIX-纳斯达克100定投策略"
+OUTPUT_DIR = ROOT / "strategy-framework" / "VIX-纳斯达克100定投策略"
 CHARTS_DIR = OUTPUT_DIR / "charts"
 REPORT_FILE = OUTPUT_DIR / "backtest_report.md"
 

@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import csv
 import json
 import re
 import shutil
@@ -302,7 +303,7 @@ def maybe_sell(position: Dict, price: float) -> Tuple[str, int, float, float, st
     
     if price >= float(sell_trigger):
         amount = shares * price
-        return ("SELL", shares, price, amount, "达到卖出触发价 %s" % sell_trigger)
+        return ("SELL", shares, price, amount, f"卖出：当前价 {price:.3f} 达到卖出触发价 {sell_trigger}，按策略全部卖出锁定收益")
     return ("HOLD", 0, 0.0, 0.0, "未达到卖出条件")
 
 
@@ -335,7 +336,7 @@ def maybe_add(position: Dict, price: float, cash: float) -> Tuple[str, int, floa
         return ("HOLD", 0, 0.0, 0.0, "预算不足")
     
     amount = buy_shares * price
-    return ("BUY_ADD", buy_shares, price, amount, "触发回撤5%加仓")
+    return ("BUY_ADD", buy_shares, price, amount, f"加仓：当前价 {price:.3f} 低于成本价 {avg_cost:.3f} 的95%（{avg_cost*0.95:.3f}），触发回撤加仓策略")
 
 
 # ========== 数据持久化 ==========
@@ -360,7 +361,42 @@ def append_daily_row(row: Dict):
     df.to_csv(DAILY_FILE, index=False, encoding="utf-8-sig")
 
 
+# ========== 决策记录 ==========
+
+DECISION_LOG_FILE = TRACK_DIR / "交易决策日志.md"
+
+def append_decision_log(action: str, name: str, ticker: str, shares: int, price: float, amount: float, reason: str, state: Dict):
+    """追加交易决策记录到日志文件"""
+    if action == "SELL":
+        line = f"{state.get('last_trade_date', '')} 卖出 {name} {shares}股@{price:.3f}，{reason}\n"
+    elif action == "BUY_OPEN":
+        line = f"{state.get('last_trade_date', '')} 买入 {name} {shares}股@{price:.3f}，{reason}\n"
+    elif action == "BUY_ADD":
+        line = f"{state.get('last_trade_date', '')} 加仓 {name} {shares}股@{price:.3f}，{reason}\n"
+    elif action == "REDUCE":
+        line = f"{state.get('last_trade_date', '')} 减仓 {name} {shares}股@{price:.3f}，{reason}\n"
+    else:
+        line = f"{state.get('last_trade_date', '')} {action} {name}: {reason}\n"
+    
+    if DECISION_LOG_FILE.exists():
+        content = DECISION_LOG_FILE.read_text(encoding="utf-8")
+    else:
+        content = "# 交易决策日志\n\n每次交易自动记录，用最简单的话描述\n\n"
+    
+    DECISION_LOG_FILE.write_text(content + line, encoding="utf-8")
+    print("[LOG] 决策记录已追加")
+
+
 # ========== Dashboard ==========
+
+def load_trades_for_dashboard() -> list[dict]:
+    """加载交易记录用于构建recent_actions"""
+    if not TRADES_FILE.exists():
+        return []
+    with open(TRADES_FILE, "r", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        return list(reader)
+
 
 def build_dashboard_snapshot(state: Dict, price_map: Dict[str, PricePoint]):
     """生成Dashboard快照"""
@@ -408,6 +444,36 @@ def build_dashboard_snapshot(state: Dict, price_map: Dict[str, PricePoint]):
     for p in positions:
         p["weight_pct"] = round((p["market_value"] / net_value) * 100, 4) if net_value else 0.0
     
+    trades = load_trades_for_dashboard()
+    recent_actions = []
+    for t in trades[-20:]:
+        recent_actions.append({
+            "date": t.get("date", ""),
+            "ticker": t.get("ticker", ""),
+            "name": t.get("name", ""),
+            "action": t.get("action", ""),
+            "price": float(t.get("price", 0)),
+            "shares": int(t.get("shares", 0)),
+            "amount": float(t.get("amount", 0)),
+            "reason": t.get("reason", ""),
+        })
+
+    grouped_trades = {}
+    for t in trades:
+        date = t.get("date", "")
+        if date not in grouped_trades:
+            grouped_trades[date] = []
+        grouped_trades[date].append({
+            "ticker": t.get("ticker", ""),
+            "name": t.get("name", ""),
+            "action": t.get("action", ""),
+            "price": float(t.get("price", 0)),
+            "shares": int(t.get("shares", 0)),
+            "amount": float(t.get("amount", 0)),
+            "reason": t.get("reason", ""),
+        })
+    grouped_trades = dict(sorted(grouped_trades.items(), reverse=True))
+    
     snapshot = {
         "meta": {
             "template_version": "V5.5.12",
@@ -425,6 +491,8 @@ def build_dashboard_snapshot(state: Dict, price_map: Dict[str, PricePoint]):
             "positions": positions,
         },
         "today_actions": [],
+        "recent_actions": recent_actions,
+        "grouped_trades": grouped_trades,
     }
     
     text = json.dumps(snapshot, ensure_ascii=False, indent=2)
@@ -537,6 +605,7 @@ def run() -> int:
                 "reason": reason,
             })
             print("[ALERT] 卖出: %s %d股 @ %.3f" % (pos.get("name"), action_shares, action_price))
+            append_decision_log(action, pos.get("name", ""), ticker, int(action_shares), action_price, action_amount, reason, state)
         
         # 再尝试加仓
         elif shares > 0:
@@ -563,6 +632,7 @@ def run() -> int:
                     "reason": reason,
                 })
                 print("[ALERT] 加仓: %s %d股 @ %.3f" % (pos.get("name"), action_shares, action_price))
+                append_decision_log(action, pos.get("name", ""), ticker, int(action_shares), action_price, action_amount, reason, state)
         
         # 记录每日快照
         mv = int(pos.get("shares", 0)) * pp.close

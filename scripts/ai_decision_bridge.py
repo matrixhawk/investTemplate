@@ -164,7 +164,9 @@ class LLMClient:
             return self._call_openai(prompt)
         elif self.provider == "claude":
             return self._call_claude(prompt)
-        elif self.provider in ("deepseek", "moonshot"):
+        elif self.provider == "deepseek":
+            return self._call_deepseek(prompt)
+        elif self.provider == "moonshot":
             return self._call_openai(prompt)
         else:
             raise RuntimeError(f"不支持的 provider: {self.provider}")

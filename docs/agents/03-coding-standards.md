@@ -36,7 +36,7 @@ from typing import Dict, List, Optional
 
 # 配置集中管理
 SCREENING_CONFIG = {
-    "version": "V5.5.14",
+    "version": "V5.5.23",
     "criteria": {
         "pb_max": 0.6,
         "dividend_yield_min": 0.06,
@@ -139,7 +139,7 @@ jobs:
 ### 结构示例
 
 ```yaml
-version: "V5.5.14"
+version: "V5.5.23"
 
 # 仓位限制规则
 position_limits:
@@ -177,18 +177,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]  # scripts/的上级是项目根目录
 
 # 文件路径
-STATE_FILE = ROOT / "08-决策追踪" / "simulation_state.json"
-TRADES_FILE = ROOT / "08-决策追踪" / "simulation_trades.csv"
+STATE_FILE = ROOT / "decision-tracking" / "simulation_state.json"
+TRADES_FILE = ROOT / "decision-tracking" / "simulation_trades.csv"
 ```
 
 ### 路径常量
 
 ```python
 # 决策追踪目录
-TRACKING_DIR = ROOT / "08-决策追踪"
+TRACKING_DIR = ROOT / "decision-tracking"
 
 # 分析输出目录
-OUTPUT_DIR = ROOT / "07-分析输出"
+OUTPUT_DIR = ROOT / "analysis-reports"
 
 # 模拟持仓目录
 PORTFOLIO_DIR = ROOT / "模拟持仓"

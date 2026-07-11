@@ -8,8 +8,7 @@ VIX定投策略数据一致性校验脚本 V1.0
 2. daily_returns.csv 收益率计算正确性
 3. daily_snapshot.csv 数据完整性
 4. returns_curve.html rawData 与数据源一致性
-5. decision-tracking/ 与 08-决策追踪/ 目录同步
-6. 收益率口径一致性（防止基于不同 principal 的跳变）
+5. 收益率口径一致性（防止基于不同 principal 的跳变）
 """
 
 import json
@@ -26,7 +25,6 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 ROOT = Path(__file__).resolve().parents[1]
 STRATEGY_DIR = ROOT / "decision-tracking" / "vix_dca_strategy"
 PUBLIC_DIR = ROOT / "public" / "vix_strategy"
-ALT_DIR = ROOT / "08-决策追踪" / "vix_dca_strategy"
 
 ERRORS = []
 WARNINGS = []
@@ -110,8 +108,6 @@ def check_daily_returns():
     # 重建 cumulative_buy 历史
     state = load_json(STRATEGY_DIR / "state.json")
     trades = []
-    alt_trades = load_csv_rows(ALT_DIR / "trades.csv") if (ALT_DIR / "trades.csv").exists() else []
-
     # 从 dashboard 读取交易记录
     db = load_json(STRATEGY_DIR / "dashboard_data.json")
     for t in db.get('recent_trades', []):
@@ -124,8 +120,6 @@ def check_daily_returns():
         date = row['date']
         # 检查是否有当日买入
         buy_amount = sum(t['amount'] for t in trades if t['date'] == date)
-        if buy_amount == 0 and alt_trades:
-            buy_amount = sum(float(t['amount']) for t in alt_trades if t['date'] == date)
         cumulative_buy += buy_amount
         cum_history[date] = cumulative_buy
 
@@ -295,49 +289,6 @@ def check_public_daily_returns_sync():
     ok("public/vix_strategy/daily_returns.csv synced")
 
 
-def check_alt_dir_sync():
-    """校验5: decision-tracking/ 与 08-决策追踪/ 目录同步"""
-    print("\n【校验5】decision-tracking/ ↔ 08-决策追踪/ 目录同步")
-
-    files_to_check = ['state.json', 'daily_snapshot.csv', 'daily_returns.csv', 'dashboard_data.json']
-    has_sync_issue = False
-    for fname in files_to_check:
-        main_path = STRATEGY_DIR / fname
-        alt_path = ALT_DIR / fname
-        if not main_path.exists():
-            has_sync_issue = True
-            error(f"decision-tracking/ 缺少文件: {fname}")
-            continue
-        if not alt_path.exists():
-            has_sync_issue = True
-            warn(f"08-决策追踪/ 缺少文件: {fname}")
-            continue
-        if fname.endswith('.json'):
-            main_data = load_json(main_path)
-            alt_data = load_json(alt_path)
-            # 简化比较：只比较关键字段
-            if fname == 'state.json':
-                keys = [('position.shares', main_data.get('position', {}).get('shares'), alt_data.get('position', {}).get('shares')),
-                        ('position.current_price', main_data.get('position', {}).get('current_price'), alt_data.get('position', {}).get('current_price'))]
-            else:
-                keys = []
-            for k, m, a in keys:
-                if m != a:
-                    has_sync_issue = True
-                    error(f"{fname} 不同步: {k} (主={m}, 旧={a})")
-        else:
-            with open(main_path, 'r', encoding='utf-8') as f:
-                main_content = f.read()
-            with open(alt_path, 'r', encoding='utf-8') as f:
-                alt_content = f.read()
-            if main_content != alt_content:
-                has_sync_issue = True
-                error(f"{fname} 内容不同步")
-
-    if not has_sync_issue:
-        ok("decision-tracking/ 与 08-决策追踪/ 数据同步")
-
-
 def check_capital_mode():
     """校验6: state.json 中 capital_mode 必须存在且一致"""
     print("\n【校验6】capital_mode 配置检查")
@@ -362,7 +313,6 @@ def main():
     check_daily_snapshot()
     check_returns_curve()
     check_public_daily_returns_sync()
-    check_alt_dir_sync()
     check_capital_mode()
 
     print("\n" + "=" * 60)

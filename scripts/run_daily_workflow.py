@@ -306,7 +306,7 @@ def rule_sell(position: Dict, price: float) -> Optional[TradeAction]:
             shares=shares,
             amount=shares * price,
             cash_after=0.0,  # 稍后计算
-            reason=f"达到卖出触发价 {sell_trigger}",
+            reason=f"卖出：当前价 {price:.3f} 达到卖出触发价 {sell_trigger}，按策略全部卖出锁定收益",
             source="RULE",
         )
     return None
@@ -348,7 +348,7 @@ def rule_add_on_drawdown(position: Dict, price: float, cash: float) -> Optional[
         shares=buy_shares,
         amount=buy_shares * price,
         cash_after=0.0,
-        reason="触发回撤5%加仓",
+        reason=f"加仓：当前价 {price:.3f} 低于成本价 {avg_cost:.3f} 的95%（{avg_cost*0.95:.3f}），触发回撤加仓策略",
         source="RULE",
     )
 
@@ -540,6 +540,34 @@ def execute_trade(state: Dict, action: TradeAction, dry_run: bool = False) -> fl
     return cash
 
 
+# ---------- 决策记录 ----------
+
+DECISION_LOG_FILE = TRACK_DIR / "交易决策日志.md"
+
+def append_decision_log(action: TradeAction, state: Dict):
+    """追加交易决策记录到日志文件"""
+    cash = float(state.get("cash", 0))
+    
+    if action.action == "SELL":
+        line = f"{action.date} 卖出 {action.name} {action.shares}股@{action.price:.3f}，{action.reason}\n"
+    elif action.action == "BUY_OPEN":
+        line = f"{action.date} 买入 {action.name} {action.shares}股@{action.price:.3f}，{action.reason}\n"
+    elif action.action == "BUY_ADD":
+        line = f"{action.date} 加仓 {action.name} {action.shares}股@{action.price:.3f}，{action.reason}\n"
+    elif action.action == "REDUCE":
+        line = f"{action.date} 减仓 {action.name} {action.shares}股@{action.price:.3f}，{action.reason}\n"
+    else:
+        line = f"{action.date} {action.action} {action.name}: {action.reason}\n"
+    
+    if DECISION_LOG_FILE.exists():
+        content = DECISION_LOG_FILE.read_text(encoding="utf-8")
+    else:
+        content = "# 交易决策日志\n\n每次交易自动记录，用最简单的话描述\n\n"
+    
+    DECISION_LOG_FILE.write_text(content + line, encoding="utf-8")
+    log(f"[LOG] 决策记录已追加: {action.date} {action.name}")
+
+
 # ---------- Dashboard 生成 ----------
 
 def build_dashboard(state: Dict, price_map: Dict[str, PricePoint], today_actions: List[TradeAction]):
@@ -600,6 +628,23 @@ def build_dashboard(state: Dict, price_map: Dict[str, PricePoint], today_actions
             "reason": t.get("reason", ""),
         })
 
+    # 按日期分组的交易记录（用于网页分层显示）
+    grouped_trades = {}
+    for t in trades:
+        date = t.get("date", "")
+        if date not in grouped_trades:
+            grouped_trades[date] = []
+        grouped_trades[date].append({
+            "ticker": t.get("ticker", ""),
+            "name": t.get("name", ""),
+            "action": t.get("action", ""),
+            "price": float(t.get("price", 0)),
+            "shares": int(t.get("shares", 0)),
+            "amount": float(t.get("amount", 0)),
+            "reason": t.get("reason", ""),
+        })
+    grouped_trades = dict(sorted(grouped_trades.items(), reverse=True))
+
     today_action_records = []
     for a in today_actions:
         today_action_records.append({
@@ -631,6 +676,7 @@ def build_dashboard(state: Dict, price_map: Dict[str, PricePoint], today_actions
         },
         "today_actions": today_action_records,
         "recent_actions": recent_actions,
+        "grouped_trades": grouped_trades,
         "ai_summary": {
             "ai_decisions_today": sum(1 for a in today_actions if a.source == "AI"),
             "rule_decisions_today": sum(1 for a in today_actions if a.source == "RULE"),
@@ -693,12 +739,19 @@ def run_daily_workflow(dry_run: bool = False, manual_review: bool = False) -> in
         build_dashboard(state, price_map, [])
         return 0
 
-    # 5. 获取 VHSI
-    log("[STEP 5] 获取 VHSI...")
+    # 5. 全市场筛选
+    log("[STEP 5] 全市场筛选...")
+    screen_results = run_market_screen(state)
+    if screen_results:
+        log(f"[OK] 筛选出 {len(screen_results)} 只新标的")
+        state = update_positions_with_screen_results(state, screen_results)
+
+    # 6. 获取 VHSI
+    log("[STEP 6] 获取 VHSI...")
     vhsi = fetch_vhsi()
     log(f"[OK] VHSI: {vhsi:.2f}")
 
-    # 6. 规则引擎 + AI 触发扫描
+    # 7. 规则引擎 + AI 触发扫描
     log("[STEP 6] 执行规则扫描与 AI 触发检测...")
     portfolio_context = build_portfolio_context(state, price_map)
     today_actions: List[TradeAction] = []
@@ -813,6 +866,7 @@ def run_daily_workflow(dry_run: bool = False, manual_review: bool = False) -> in
         else:
             for action in today_actions:
                 cash = execute_trade(state, action, dry_run=False)
+                append_decision_log(action, state)
 
     # 9. 更新 state
     if not dry_run:
@@ -994,6 +1048,106 @@ def apply_ai_response() -> int:
     log("[DONE] AI 决策已应用")
     log("=" * 60)
     return 0
+
+
+def run_market_screen(state: Dict) -> List[Dict]:
+    screen_dir = ROOT / "01-筛选框架"
+    output_file = screen_dir / "output" / "latest_results.json"
+    
+    if not screen_dir.exists():
+        log("[SKIP] 筛选框架目录不存在")
+        return []
+    
+    try:
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, str(screen_dir / "hk_stock_screener.py")],
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+        log(f"筛选器输出: {result.stdout[-200:] if len(result.stdout) > 200 else result.stdout}")
+        if result.returncode != 0:
+            log(f"[WARN] 筛选器执行失败: {result.stderr}")
+            return []
+    except Exception as e:
+        log(f"[WARN] 执行筛选器失败: {e}")
+        return []
+    
+    if not output_file.exists():
+        return []
+    
+    try:
+        with open(output_file, 'r', encoding='utf-8') as f:
+            results = json.load(f)
+        
+        new_stocks = []
+        for strategy_key, stocks in results.items():
+            for stock in stocks:
+                code = stock['code']
+                if len(code) == 5:
+                    ticker = "%04d.HK" % int(code)
+                else:
+                    continue
+                
+                if ticker in state["positions"]:
+                    continue
+                
+                new_stocks.append(stock)
+        
+        return new_stocks
+    except Exception as e:
+        log(f"[WARN] 读取筛选结果失败: {e}")
+        return []
+
+
+def update_positions_with_screen_results(state: Dict, screen_results: List[Dict]) -> Dict:
+    for stock in screen_results:
+        code = stock['code']
+        if len(code) == 5:
+            ticker = "%04d.HK" % int(code)
+        else:
+            continue
+        
+        if ticker in state["positions"]:
+            continue
+        
+        price = stock.get('price', 0)
+        pe = stock.get('pe', 0)
+        pb = stock.get('pb', 0)
+        dividend_yield = stock.get('dividend_yield', 0)
+        
+        target_buy = price * 0.95
+        sell_trigger = price * 1.35
+        lot_size = 1000
+        
+        strategy = stock.get('strategy', '')
+        if strategy == '净现金股':
+            reason = f"🐢🍊极品：净现金>市值，PB {pb:.2f}倍，PE {pe:.2f}倍"
+        elif strategy == '烟蒂股':
+            reason = f"🐢🍊烟蒂：PB {pb:.2f}倍，市值 {stock.get('market_cap', 0):.0f}亿"
+        elif strategy == '高股息':
+            reason = f"🐢🍊高股息：股息率 {dividend_yield:.1f}%，PE {pe:.2f}倍"
+        elif strategy == '低估股':
+            reason = f"🐢🍊低估：PE {pe:.2f}倍，ROE {stock.get('roe', 0):.1f}%"
+        else:
+            reason = f"🐢🍊{strategy}：PE {pe:.2f}倍，PB {pb:.2f}倍"
+        
+        state["positions"][ticker] = {
+            "name": stock['name'],
+            "code": code,
+            "shares": 0,
+            "avg_cost": 0.0,
+            "target_buy": target_buy,
+            "sell_trigger": sell_trigger,
+            "lot_size": lot_size,
+            "strategy": strategy,
+            "initial_reason": reason,
+        }
+        log(f"[NEW] 添加观察标的: {stock['name']} ({ticker}) - {strategy}")
+    
+    save_state(state)
+    return state
 
 
 def main():

@@ -44,6 +44,13 @@ class DataValidator:
         print("=" * 60)
         print("[VALIDATION] 开始数据质量硬校验")
         print("=" * 60)
+
+        # 先拦截旧版/错误结构，避免后续校验出现难以理解的AttributeError
+        if not self._validate_schema_compatibility():
+            self.result.errors = self.errors
+            self.result.warnings = self.warnings
+            self.result.passed = False
+            return self.result
         
         # 1. 元数据校验
         self._validate_metadata()
@@ -56,6 +63,9 @@ class DataValidator:
         
         # 4. 利润数据校验（S级）
         self._validate_profit_data()
+
+        # 4.5 估值适用性与TTM时点校验（V5.5.23）
+        self._validate_valuation_data()
         
         # 5. 现金流数据校验（S级）
         self._validate_cashflow_data()
@@ -84,6 +94,22 @@ class DataValidator:
         self.result.passed = len(self.errors) == 0
         
         return self.result
+
+    def _validate_schema_compatibility(self) -> bool:
+        """确认输入使用当前YAML结构；旧版文件给出迁移提示而不是直接崩溃。"""
+        if 'analysis_metadata' not in self.data or 'core_financial_data' not in self.data:
+            self.errors.append(
+                "[SCHEMA] 输入文件不是当前数据校验结构。请从 "
+                "config/data_validation_template.yaml 重新复制，旧版 basic_info/data_sources 需迁移。"
+            )
+            return False
+
+        core = self.data.get('core_financial_data')
+        if not isinstance(core, dict):
+            self.errors.append("[SCHEMA] core_financial_data必须是对象")
+            return False
+
+        return True
     
     def _validate_metadata(self):
         """校验元数据"""
@@ -355,6 +381,53 @@ class DataValidator:
 
         if not any(e for e in self.errors if e.startswith('[CASHFLOW]')):
             print(f"   [PASS] 现金流数据校验通过")
+
+    def _validate_valuation_data(self):
+        """校验估值方法适用性和TTM四季度数据（V5.5.23）"""
+        print("\n[4.5] 估值适用性与TTM校验")
+
+        meta = self.data.get('analysis_metadata', {})
+        policy = meta.get('valuation_policy')
+        if not policy:
+            self.warnings.append("[VALUATION] 未声明valuation_policy，无法确认主估值方法和PE适用性")
+            return
+
+        primary_method = policy.get('primary_method', '')
+        if primary_method not in {'PE', 'PB', 'DPU_FFO', 'MID_CYCLE', 'PS', 'PROBABILITY_WEIGHTED'}:
+            self.errors.append("[VALUATION] primary_method必须是PE/PB/DPU_FFO/MID_CYCLE/PS/PROBABILITY_WEIGHTED之一")
+
+        if not policy.get('price_as_of'):
+            self.errors.append("[VALUATION] 必须填写股价基准日price_as_of")
+        if not policy.get('fx_as_of'):
+            self.errors.append("[VALUATION] 必须填写汇率日期fx_as_of")
+
+        if not policy.get('pe_applicable', False):
+            print(f"   [PASS] PE不适用，主估值方法: {primary_method or '未填写'}")
+            return
+
+        core = self.data.get('core_financial_data', {})
+        quarters = core.get('ttm_quarters', [])
+        if len(quarters) != 4:
+            self.errors.append(f"[VALUATION] PE适用时TTM必须填写4个季度，当前为{len(quarters)}个")
+            return
+
+        for index, quarter in enumerate(quarters, 1):
+            if not quarter.get('period'):
+                self.errors.append(f"[VALUATION] TTM第{index}个季度缺少period")
+            if quarter.get('value') is None:
+                self.errors.append(f"[VALUATION] TTM第{index}个季度缺少value")
+            if not quarter.get('source'):
+                self.errors.append(f"[VALUATION] TTM第{index}个季度缺少source")
+            if not quarter.get('page_number'):
+                self.warnings.append(f"[VALUATION] TTM第{index}个季度缺少page_number，若来源不是年报请填写公告日期/章节")
+
+        ttm_total = sum((quarter.get('value') or 0) for quarter in quarters)
+        metrics = core.get('calculated_metrics', {})
+        ttm_profit = metrics.get('ttm_net_profit', {}).get('value')
+        if ttm_profit is not None and abs(ttm_total - ttm_profit) > 0.01:
+            self.errors.append(f"[VALUATION] TTM净利润错误: 四季度合计{ttm_total}，但填写为{ttm_profit}")
+
+        print(f"   [PASS] TTM四季度数据已填写，总额: {ttm_total:,.2f}")
     
     def _validate_share_data(self):
         """校验股本数据（S级强制）"""

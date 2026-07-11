@@ -58,9 +58,6 @@ DAILY_RETURNS_FILE = STRATEGY_DIR / "daily_returns.csv"
 RETURNS_CURVE_SVG = STRATEGY_DIR / "returns_curve.svg"
 RETURNS_CURVE_HTML = STRATEGY_DIR / "returns_curve.html"
 
-# 08-决策追踪目录（数据一致性要求）
-ALT_STRATEGY_DIR = ROOT / "08-决策追踪" / "vix_dca_strategy"
-
 # ETF代码
 ETF_CODE = "513110"
 ETF_NAME = "纳斯达克100 ETF"
@@ -1916,58 +1913,6 @@ def sync_to_public(state, dashboard):
                 dst.write(src.read())
         print(f"[同步] 已同步 daily_returns.csv 到: {public_returns}")
 
-    # 同步到 08-决策追踪 目录（数据一致性要求）
-    if ALT_STRATEGY_DIR.exists():
-        alt_state = ALT_STRATEGY_DIR / "state.json"
-        save_json(alt_state, state)
-        print(f"[同步] 已同步到: {alt_state}")
-
-        alt_dashboard = ALT_STRATEGY_DIR / "dashboard_data.json"
-        save_json(alt_dashboard, dashboard)
-        print(f"[同步] 已同步到: {alt_dashboard}")
-
-        # 同步 daily_snapshot.csv
-        alt_snapshot = ALT_STRATEGY_DIR / "daily_snapshot.csv"
-        if SNAPSHOT_FILE.exists():
-            shutil.copyfile(SNAPSHOT_FILE, alt_snapshot)
-            print(f"[同步] 已同步 daily_snapshot.csv 到: {alt_snapshot}")
-
-        # 同步 daily_returns.csv
-        alt_returns = ALT_STRATEGY_DIR / "daily_returns.csv"
-        if DAILY_RETURNS_FILE.exists():
-            with open(DAILY_RETURNS_FILE, 'r', encoding='utf-8') as src:
-                with open(alt_returns, 'w', encoding='utf-8') as dst:
-                    dst.write(src.read())
-            print(f"[同步] 已同步 daily_returns.csv 到: {alt_returns}")
-
-        # 同步收益率曲线SVG
-        alt_svg = ALT_STRATEGY_DIR / "returns_curve.svg"
-        if RETURNS_CURVE_SVG.exists():
-            with open(RETURNS_CURVE_SVG, 'r', encoding='utf-8') as src:
-                with open(alt_svg, 'w', encoding='utf-8') as dst:
-                    dst.write(src.read())
-            print(f"[同步] 已同步收益率曲线SVG到: {alt_svg}")
-
-        # 同步收益率曲线HTML
-        alt_html = ALT_STRATEGY_DIR / "returns_curve.html"
-        if RETURNS_CURVE_HTML.exists():
-            with open(RETURNS_CURVE_HTML, 'r', encoding='utf-8') as src:
-                with open(alt_html, 'w', encoding='utf-8') as dst:
-                    dst.write(src.read())
-            print(f"[同步] 已同步收益率曲线HTML到: {alt_html}")
-
-        # 同步 state.json（校验脚本要求）
-        alt_state = ALT_STRATEGY_DIR / "state.json"
-        save_json(alt_state, state)
-        print(f"[同步] 已同步 state.json 到: {alt_state}")
-
-        # 同步 daily_snapshot.csv（校验脚本要求）
-        alt_snapshot = ALT_STRATEGY_DIR / "daily_snapshot.csv"
-        if SNAPSHOT_FILE.exists():
-            with open(SNAPSHOT_FILE, 'r', encoding='utf-8') as src:
-                with open(alt_snapshot, 'w', encoding='utf-8') as dst:
-                    dst.write(src.read())
-            print(f"[同步] 已同步 daily_snapshot.csv 到: {alt_snapshot}")
 
 
 # ==================== 主程序 ====================

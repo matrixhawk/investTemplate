@@ -27,7 +27,7 @@
 
 ### 1. 单一真相源原则
 
-**唯一权威数据源**：`08-决策追踪/simulation_trades.csv`
+**唯一权威数据源**：`decision-tracking/simulation_trades.csv`
 
 ```
 所有持仓数据必须以trades.csv为准：
@@ -91,7 +91,7 @@ cp simulation_state.json.20260330_214921.bak simulation_state.json
 
 **问题案例**：
 - 2026-04-09：网页显示错误成本价（0.365 vs 0.295），发现 `public/dashboard/dashboard_snapshot.json` 未同步更新
-- 根因：VitePress 网页组件从 `public/dashboard/dashboard_snapshot.json` 读取数据，而非 `08-决策追踪/dashboard_snapshot.json`
+- 根因：VitePress 网页组件从 `public/dashboard/dashboard_snapshot.json` 读取数据，而非 `decision-tracking/dashboard_snapshot.json`
 
 **强制性要求**：
 
@@ -99,16 +99,16 @@ cp simulation_state.json.20260330_214921.bak simulation_state.json
 
 ```
 修改数据源
-    ├── 1️⃣ 08-决策追踪/simulation_trades.csv      (唯一真相源)
-    ├── 2️⃣ 08-决策追踪/simulation_state.json       (运行时状态)
-    ├── 3️⃣ 08-决策追踪/dashboard_snapshot.json     (决策追踪目录)
+    ├── 1️⃣ decision-tracking/simulation_trades.csv      (唯一真相源)
+    ├── 2️⃣ decision-tracking/simulation_state.json       (运行时状态)
+    ├── 3️⃣ decision-tracking/dashboard_snapshot.json     (决策追踪目录)
     └── 4️⃣ public/dashboard/dashboard_snapshot.json  (VitePress网页数据源)  ⭐ 容易遗漏！
 ```
 
 **更新后验证清单**：
 - [ ] `simulation_trades.csv` - 成本价、股数、现金正确
 - [ ] `simulation_state.json` - 与 trades.csv 一致
-- [ ] `08-决策追踪/dashboard_snapshot.json` - 数据已更新
+- [ ] `decision-tracking/dashboard_snapshot.json` - 数据已更新
 - [ ] **`public/dashboard/dashboard_snapshot.json`** - 数据已同步 ⭐
 - [ ] 网页刷新后显示正确
 
@@ -123,10 +123,10 @@ cp simulation_state.json.20260330_214921.bak simulation_state.json
 
 | 序号 | 文件路径 | 用途 | 更新频率 |
 |------|----------|------|----------|
-| 1 | `08-决策追踪/vix_dca_strategy/trades.csv` | 交易记录（仅定投日） | 每两周一次 |
-| 2 | `08-决策追踪/vix_dca_strategy/daily_snapshot.csv` | 每日收益快照 | **每天** |
-| 3 | `08-决策追踪/vix_dca_strategy/state.json` | 当前持仓状态 | **每天** |
-| 4 | `08-决策追踪/vix_dca_strategy/dashboard_data.json` | 汇总数据 | **每天** |
+| 1 | `decision-tracking/vix_dca_strategy/trades.csv` | 交易记录（仅定投日） | 每两周一次 |
+| 2 | `decision-tracking/vix_dca_strategy/daily_snapshot.csv` | 每日收益快照 | **每天** |
+| 3 | `decision-tracking/vix_dca_strategy/state.json` | 当前持仓状态 | **每天** |
+| 4 | `decision-tracking/vix_dca_strategy/dashboard_data.json` | 汇总数据 | **每天** |
 | 5 | `模拟持仓/VIX定投策略.md` | **网页展示页面** | **每天** ⭐ |
 | 6 | `public/vix_strategy/dashboard_data.json` | 网页数据源 | **每天** ⭐ |
 
@@ -146,7 +146,7 @@ cp simulation_state.json.20260330_214921.bak simulation_state.json
     │       - 更新"关键指标"
     │
     └── 3️⃣ 同步网页数据文件（必须！）
-            copy 08-决策追踪\vix_dca_strategy\dashboard_data.json public\vix_strategy\dashboard_data.json
+            copy decision-tracking\vix_dca_strategy\dashboard_data.json public\vix_strategy\dashboard_data.json
 ```
 
 **更新后验证清单**：
@@ -267,7 +267,7 @@ cp simulation_state.json.20260330_214921.bak simulation_state.json
 ### 错误4：网页显示错误数据
 **现象**：文件改了但网页显示不对
 **原因**：`public/dashboard/dashboard_snapshot.json` 未同步
-**修复**：同时更新 `08-决策追踪/` 和 `public/dashboard/` 下的文件
+**修复**：同时更新 `decision-tracking/` 和 `public/dashboard/` 下的文件
 
 ### 错误5：历史操作记录不显示
 **现象**："今日操作"页面只显示"今日无自动操作"，最近操作流水空白
@@ -297,10 +297,10 @@ cp simulation_state.json.20260330_214921.bak simulation_state.json
 grep -q "recent_actions" public/dashboard/dashboard_snapshot.json && echo "OK" || echo "缺少 recent_actions!"
 
 # 比较两个目录的 dashboard_snapshot.json 是否一致
-diff 08-决策追踪/dashboard_snapshot.json public/dashboard/dashboard_snapshot.json
+diff decision-tracking/dashboard_snapshot.json public/dashboard/dashboard_snapshot.json
 
 # 查看 trades.csv 内容
-cat 08-决策追踪/simulation_trades.csv
+cat decision-tracking/simulation_trades.csv
 
 # 验证数据一致性
 python scripts/validate_simulation_data.py
