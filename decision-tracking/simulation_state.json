@@ -3,7 +3,7 @@
   "engine_version": "V3.1",
   "initial_capital": 500000.0,
   "cash": 104660.0,
-  "last_trade_date": "2026-07-22",
+  "last_trade_date": "2026-07-23",
   "positions": {
     "1522.HK": {
       "name": "京投交通科技",
@@ -257,6 +257,28 @@
       "sell_trigger": 0.0,
       "target_buy": null,
       "lot_size": 1000,
+      "realized_pnl": 0.0
+    },
+    "600887.SS": {
+      "name": "伊利股份",
+      "code": "600887",
+      "ticker": "600887.SS",
+      "shares": 0,
+      "avg_cost": 0.0,
+      "sell_trigger": 0.0,
+      "target_buy": null,
+      "lot_size": 100,
+      "realized_pnl": 0.0
+    },
+    "600941.SS": {
+      "name": "中国移动",
+      "code": "600941",
+      "ticker": "600941.SS",
+      "shares": 0,
+      "avg_cost": 0.0,
+      "sell_trigger": 126.9,
+      "target_buy": 94.0,
+      "lot_size": 100,
       "realized_pnl": 0.0
     }
   }
