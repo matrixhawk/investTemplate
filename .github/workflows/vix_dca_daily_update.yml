@@ -130,13 +130,16 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         
-        # 添加所有相关文件
+        # 只添加实际存在的路径（旧目录 08-决策追踪 已迁移到 decision-tracking）
         git add -A "decision-tracking/vix_dca_strategy/"
-        git add -A "08-决策追踪/vix_dca_strategy/"
         git add -A "public/vix_strategy/"
         git add -A "portfolio/vix-dca-strategy.md"
         
         # 提交
         TODAY_CN=$(date +'%Y-%m-%d')
-        git commit -m "📊 VIX定投策略更新 $TODAY_CN" || echo "No changes to commit"
-        git push
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "📊 VIX定投策略更新 $TODAY_CN"
+          git push
+        fi
