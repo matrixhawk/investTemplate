@@ -375,7 +375,8 @@ def ensure_trade_schedule(state, ref_date_str):
     """确保state中的下次定投日期与日历列表完整且一致"""
     stats = state.setdefault('statistics', {})
     schedule = state.setdefault('schedule', {})
-    next_trade = get_next_trade_date(state)
+    # 必须用 ref_date_str，否则回填历史日时会把未执行的定投日滚掉
+    next_trade = get_next_trade_date(state, ref_date_str)
     if not next_trade:
         ref_dt = datetime.strptime(ref_date_str, '%Y-%m-%d')
         days = (1 - ref_dt.weekday()) % 7
@@ -397,14 +398,19 @@ def roll_next_trade_schedule(state, executed_trade_date):
 
 
 def get_next_trade_date(state, ref_date_str=None):
-    """兼容不同state结构，解析下次定投日；若已过期则自动滚动"""
+    """兼容不同state结构，解析下次定投日。
+
+    仅当 next_trade 严格早于参考日时才滚动。
+    回填历史数据时必须传入 ref_date_str=目标交易日，
+    否则会用系统“今天”把未执行的定投日直接跳过。
+    """
     schedule = state.get('schedule', {})
     next_trade = schedule.get('next_trade_date')
-    today = ref_date_str or datetime.now().strftime('%Y-%m-%d')
+    ref = ref_date_str or datetime.now().strftime('%Y-%m-%d')
     if next_trade:
-        if next_trade < today:
+        if next_trade < ref:
             dt = datetime.strptime(next_trade, '%Y-%m-%d')
-            while dt.strftime('%Y-%m-%d') <= today:
+            while dt.strftime('%Y-%m-%d') < ref:
                 dt += timedelta(days=14)
             next_trade = dt.strftime('%Y-%m-%d')
             schedule['next_trade_date'] = next_trade
@@ -965,7 +971,7 @@ def update_dashboard_data(dashboard, state, date_str, vix, price, trade_infos):
     principal = get_tracking_principal(state)
     cash = float(acc.get('cash', 0) or 0)
     total_assets = get_total_assets_value(state)
-    next_trade_date = get_next_trade_date(state)
+    next_trade_date = get_next_trade_date(state, date_str)
     days_until_next = None
     if next_trade_date:
         days_until_next = (datetime.strptime(next_trade_date, '%Y-%m-%d') - datetime.strptime(date_str, '%Y-%m-%d')).days
@@ -1049,7 +1055,7 @@ def update_markdown_template(state, date_str, vix, price):
     recent_trades = dashboard.get('recent_trades', [])[:10]
 
     schedule = state.get('schedule', {})
-    next_trade = get_next_trade_date(state)
+    next_trade = get_next_trade_date(state, date_str)
     days_until = (datetime.strptime(next_trade, '%Y-%m-%d') - datetime.strptime(date_str, '%Y-%m-%d')).days if next_trade else None
     upcoming_trades = schedule.get('upcoming_trade_dates', [])
     if not upcoming_trades and next_trade:
@@ -1943,7 +1949,7 @@ def main():
     is_trading = is_trading_day(
         date_str,
         state['statistics'].get('last_trade_date'),
-        get_next_trade_date(state)
+        get_next_trade_date(state, date_str)
     )
 
     if args.vix is not None:

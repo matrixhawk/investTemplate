@@ -15,46 +15,46 @@
     "capital_mode": "dca",
     "currency": "CNY",
     "cash": 91603.51,
-    "last_update": "2026-07-10"
+    "last_update": "2026-07-23"
   },
   "position": {
-    "shares": 5359,
-    "avg_cost": 2.182185668968091,
-    "total_cost": 11694.333,
-    "current_price": 2.44,
-    "market_value": 13075.96,
-    "unrealized_pnl": 1381.6269999999986,
-    "return_pct": 11.81
+    "shares": 5769,
+    "avg_cost": 2.2002414629918534,
+    "total_cost": 12693.193000000001,
+    "current_price": 2.389,
+    "market_value": 13782.141,
+    "unrealized_pnl": 1088.9479999999985,
+    "return_pct": 8.58
   },
   "daily_performance": {
-    "date": "2026-07-10",
-    "vix": 15.95,
-    "daily_pnl": 5.36,
-    "total_pnl": 1381.63,
-    "total_return_pct": 11.76
+    "date": "2026-07-23",
+    "vix": 17.59,
+    "daily_pnl": -5.77,
+    "total_pnl": 1088.95,
+    "total_return_pct": 8.52
   },
   "statistics": {
-    "cumulative_buy": 11700.0,
+    "cumulative_buy": 12700.0,
     "cumulative_sell": 0,
-    "trade_count": 7,
-    "buy_count": 7,
+    "trade_count": 8,
+    "buy_count": 8,
     "sell_count": 0,
-    "total_invested": 11700.0,
+    "total_invested": 12700.0,
     "hold_days": 14,
-    "last_trade_date": "2026-06-30",
-    "next_trade_date": "2026-07-14"
+    "last_trade_date": "2026-07-14",
+    "next_trade_date": "2026-07-28"
   },
   "schedule": {
     "frequency": "每双周周二",
     "anchor_date": "2026-03-24",
     "upcoming_trade_dates": [
-      "2026-07-14",
       "2026-07-28",
       "2026-08-11",
       "2026-08-25",
-      "2026-09-08"
+      "2026-09-08",
+      "2026-09-22"
     ],
-    "next_trade_date": "2026-07-14"
+    "next_trade_date": "2026-07-28"
   },
   "history": {
     "vix_high": 21.23,
@@ -93,6 +93,10 @@
       {
         "date": "2026-06-30",
         "vix": 17.56
+      },
+      {
+        "date": "2026-07-14",
+        "vix": 16.5
       }
     ],
     "cumulative_sell_ratio": 0.0,
