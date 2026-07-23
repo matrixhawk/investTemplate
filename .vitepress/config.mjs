@@ -130,6 +130,8 @@ export default defineConfig({
               text: '📈 A股分析报告',
               collapsed: true,
               items: [
+                { text: '中国移动_600941', link: '/analysis-reports/中国移动_600941_投资分析报告' },
+                { text: '伊利股份_600887', link: '/analysis-reports/伊利股份_600887_投资分析报告' },
                 { text: '五粮液_000858', link: '/analysis-reports/五粮液_000858_投资分析报告' },
                 { text: '分众传媒_002027', link: '/analysis-reports/分众传媒_002027_投资分析报告' },
                 { text: '青岛啤酒_600600', link: '/analysis-reports/青岛啤酒_600600_投资分析报告' },
