@@ -20,6 +20,10 @@ R6_REVISION_PATTERN = re.compile(
     r"(?:2026-09-06-r6|V5\.5\.24-r6)",
     re.IGNORECASE,
 )
+R7_REVISION_PATTERN = re.compile(
+    r"(?:2026-10-10-r7|V5\.5\.24-r7)",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -62,6 +66,13 @@ R6_REQUIRED_TEXT_PATTERNS = {
     "分红准入": re.compile(r"分红准入"),
 }
 
+R7_REQUIRED_TEXT_PATTERNS = {
+    "盈利收益率": re.compile(r"盈利收益率"),
+    "审慎净现金/市值": re.compile(r"审慎净现金\s*/\s*市值|审慎净现金.{0,20}市值"),
+    "融资义务/市值": re.compile(r"融资性现金义务.{0,20}市值|融资义务.{0,20}市值"),
+    "负债现金分类": re.compile(r"負債按現金屬性分類|负债按现金属性分类|負債分類|负债分类"),
+}
+
 
 def load_current_version() -> str:
     data = yaml.safe_load(VERSION_FILE.read_text(encoding="utf-8"))
@@ -90,8 +101,14 @@ def audit_report(path: Path, current_version: str) -> ReportAudit:
     # r6 is opt-in by explicit revision marker so existing reports can be
     # migrated on their normal review cycle.  This is a textual presence
     # check only; numerical and analytical quality require human/data checks.
-    if audit.current and R6_REVISION_PATTERN.search(text):
+    if audit.current and (
+        R6_REVISION_PATTERN.search(text) or R7_REVISION_PATTERN.search(text)
+    ):
         for label, pattern in R6_REQUIRED_TEXT_PATTERNS.items():
+            if not pattern.search(text):
+                audit.errors.append(f"缺少{label}")
+    if audit.current and R7_REVISION_PATTERN.search(text):
+        for label, pattern in R7_REQUIRED_TEXT_PATTERNS.items():
             if not pattern.search(text):
                 audit.errors.append(f"缺少{label}")
     return audit

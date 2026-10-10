@@ -1,8 +1,8 @@
 template:
   id: "V5.5.24"
-  name: "分红优先、量化准入与现金负债分级版"
-  updated: "2026-10-10"
-  revision: "2026-10-10-r7"
+  name: "分红优先与现金覆盖版"
+  updated: "2026-09-06"
+  revision: "2026-09-06-r6"
   data_schema_version: "V5.5.24.2"
   entrypoint: "analysis-template.md"
   chapter_dir: "template/"
@@ -23,8 +23,6 @@ policy:
   top_tier_flow_guide: "analysis-template.md#05-顶格标的判定v5524-r3新增"
   dividend_first_policy_source: "analysis-template.md#dividend-first-policy"
   dividend_first_detail_source: "template/06-估值与安全边际.md#dividend-first-policy"
-  quantitative_entry_gate_source: "template/06-估值与安全边际.md#一级量化准入与回报分档v5524-r7"
-  liability_cash_classification_source: "template/00-报告输出契约.md"
   a_share_diff_valuation_source: "template/06-估值与安全边际.md#60a-a股港股差异化估值标准v5511新增v5524-r3确认当前有效"
 
 rules:
@@ -52,11 +50,3 @@ rules:
   top_tier_cross_period_actual_fcf_to_ordinary_dividend_min: 1.0
   top_tier_net_cash_100pct_required: false
   existing_holding_forced_sell_on_price_yield_below_5: false
-  quantitative_entry_gate_enabled: true
-  ttm_earnings_yield_min: 0.10
-  immediate_net_cash_to_market_cap_min: 0.20
-  strong_net_cash_to_market_cap_min: 0.30
-  financing_cash_obligations_to_market_cap_max_for_entry: 0.05
-  valuation_pe_and_earnings_yield_are_one_gate: true
-  rank_by_gate_status_not_condition_count: true
-  operating_contract_liabilities_are_not_financial_debt: true
