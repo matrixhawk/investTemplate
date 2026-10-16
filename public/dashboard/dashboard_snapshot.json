@@ -2,16 +2,16 @@
   "meta": {
     "template_version": "V5.5.12",
     "engine_version": "V3.1",
-    "generated_at": "2026-10-15 13:35:01",
-    "latest_trade_date": "2026-10-15"
+    "generated_at": "2026-10-16 13:23:43",
+    "latest_trade_date": "2026-10-16"
   },
   "portfolio": {
     "initial_capital": 500000.0,
-    "cash": 51010.0,
-    "market_value": 357954.01,
-    "net_value": 408964.01,
-    "total_return_pct": -18.2072,
-    "position_ratio_pct": 71.5908,
+    "cash": 49864.0,
+    "market_value": 355357.0,
+    "net_value": 405221.0,
+    "total_return_pct": -18.9558,
+    "position_ratio_pct": 71.0714,
     "positions": [
       {
         "name": "中国食品",
@@ -24,7 +24,7 @@
         "market_value": 40300.0,
         "unrealized": 0.0,
         "sell_trigger": 5.31,
-        "weight_pct": 9.8542,
+        "weight_pct": 9.9452,
         "status": "占位"
       },
       {
@@ -33,26 +33,26 @@
         "ticker": "0882.HK",
         "shares": 40000,
         "avg_cost": 2.55,
-        "close": 2.005,
-        "change_pct": 0.7538,
-        "market_value": 80200.0,
-        "unrealized": -21800.0,
+        "close": 1.985,
+        "change_pct": -0.9975,
+        "market_value": 79400.0,
+        "unrealized": -22600.0,
         "sell_trigger": 4.5,
-        "weight_pct": 19.6105,
+        "weight_pct": 19.5942,
         "status": "实时"
       },
       {
         "name": "京投交通科技",
         "code": "01522",
         "ticker": "1522.HK",
-        "shares": 386000,
-        "avg_cost": 0.284533,
-        "close": 0.194,
-        "change_pct": -3.0,
-        "market_value": 74884.0,
-        "unrealized": -34945.74,
+        "shares": 392000,
+        "avg_cost": 0.283101,
+        "close": 0.191,
+        "change_pct": -1.5464,
+        "market_value": 74872.0,
+        "unrealized": -36103.59,
         "sell_trigger": 0.6,
-        "weight_pct": 18.3107,
+        "weight_pct": 18.4768,
         "status": "实时"
       },
       {
@@ -61,12 +61,12 @@
         "ticker": "3320.HK",
         "shares": 17000,
         "avg_cost": 5.227059,
-        "close": 4.71,
-        "change_pct": 1.9481,
-        "market_value": 80070.0,
-        "unrealized": -8790.0,
+        "close": 4.605,
+        "change_pct": -2.2293,
+        "market_value": 78285.0,
+        "unrealized": -10575.0,
         "sell_trigger": 9.0,
-        "weight_pct": 19.5787,
+        "weight_pct": 19.3191,
         "status": "实时"
       },
       {
@@ -76,11 +76,11 @@
         "shares": 250000,
         "avg_cost": 0.432,
         "close": 0.33,
-        "change_pct": 1.5385,
+        "change_pct": 0.0,
         "market_value": 82500.0,
         "unrealized": -25500.0,
         "sell_trigger": 1.0,
-        "weight_pct": 20.1729,
+        "weight_pct": 20.3593,
         "status": "实时"
       }
     ]
@@ -216,9 +216,30 @@
       "shares": 11000,
       "amount": 2134.0,
       "reason": "加仓：当前价 0.194 低于成本价 0.287 的95%（0.273），触发回撤加仓策略"
+    },
+    {
+      "date": "2026-10-16",
+      "ticker": "1522.HK",
+      "name": "京投交通科技",
+      "action": "BUY_ADD",
+      "price": 0.191,
+      "shares": 6000,
+      "amount": 1146.0,
+      "reason": "加仓：当前价 0.191 低于成本价 0.285 的95%（0.270），触发回撤加仓策略"
     }
   ],
   "grouped_trades": {
+    "2026-10-16": [
+      {
+        "ticker": "1522.HK",
+        "name": "京投交通科技",
+        "action": "BUY_ADD",
+        "price": 0.191,
+        "shares": 6000,
+        "amount": 1146.0,
+        "reason": "加仓：当前价 0.191 低于成本价 0.285 的95%（0.270），触发回撤加仓策略"
+      }
+    ],
     "2026-10-15": [
       {
         "ticker": "1522.HK",
