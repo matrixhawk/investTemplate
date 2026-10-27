@@ -1,37 +1,50 @@
 {
   "strategy": "VIX定投策略_纳指100",
   "version": "V2.1",
-  "last_update": "2026-10-13",
+  "last_update": "2026-10-27",
   "account": {
-    "initial_capital": 79000.0,
-    "cash": 20.48,
-    "total_assets": 88864.92
+    "initial_capital": 84000.0,
+    "cash": 21.59,
+    "total_assets": 88909.77
   },
   "position": {
     "etf_code": "513110",
     "etf_name": "纳斯达克100 ETF",
-    "shares": 33936,
-    "avg_cost": 2.327,
-    "current_price": 2.618,
-    "market_value": 88844.45,
-    "total_cost": 78979.53,
-    "unrealized_pnl": 9864.91,
-    "return_pct": 12.49
+    "shares": 35958,
+    "avg_cost": 2.335,
+    "current_price": 2.472,
+    "market_value": 88888.18,
+    "total_cost": 83978.42,
+    "unrealized_pnl": 4909.76,
+    "return_pct": 5.85
   },
   "performance": {
-    "total_pnl": 9864.91,
-    "total_return_pct": 12.49,
-    "daily_pnl": 1985.17,
-    "vix": 15.3,
-    "date": "2026-10-13"
+    "total_pnl": 4909.76,
+    "total_return_pct": 5.84,
+    "daily_pnl": -4955.16,
+    "vix": 17.9,
+    "date": "2026-10-27"
   },
   "schedule": {
     "frequency": "每双周周二",
-    "last_trade_date": "2026-10-13",
-    "next_trade_date": "2026-10-27",
+    "last_trade_date": "2026-10-27",
+    "next_trade_date": "2026-11-10",
     "days_until_next": 14
   },
   "recent_trades": [
+    {
+      "date": "2026-10-27",
+      "vix": 15.3,
+      "action": "BUY",
+      "amount": 5000,
+      "shares": 2022,
+      "price": 2.472,
+      "fee": 0.5,
+      "total_cost": 4998.884,
+      "cash_before": 20.476999999998952,
+      "cash_after": 21.592999999998938,
+      "label": "正常定投"
+    },
     {
       "date": "2026-10-13",
       "vix": 15.86,
@@ -124,18 +137,16 @@
       "shares": 2037,
       "price": 2.454,
       "label": "正常定投"
-    },
-    {
-      "date": "2026-06-09",
-      "vix": 18.92,
-      "action": "BUY",
-      "amount": 5000,
-      "shares": 2035,
-      "price": 2.456,
-      "label": "正常定投"
     }
   ],
   "daily_snapshots": [
+    {
+      "date": "2026-10-27",
+      "price": 2.472,
+      "pnl": 4909.76,
+      "daily_pnl": -4955.16,
+      "total_return_pct": 5.84
+    },
     {
       "date": "2026-10-13",
       "price": 2.618,
@@ -198,13 +209,6 @@
       "pnl": 4775.39,
       "daily_pnl": -32.91,
       "total_return_pct": 11.94
-    },
-    {
-      "date": "2026-06-09",
-      "price": 2.456,
-      "pnl": 4808.3,
-      "daily_pnl": 197.89,
-      "total_return_pct": 13.74
     }
   ],
   "strategy_version": "V2.1",
