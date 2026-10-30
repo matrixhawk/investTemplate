@@ -4,7 +4,7 @@ schema_version: "V5.5.24.2"
 analysis_metadata:
   stock_code: "06049.HK"
   stock_name: "保利物业"
-  report_date: "2026-09-05"
+  report_date: "2026-10-30"
   analyst: "Codex"
   annual_report_year: 2025
   annual_report_date: "2026-04-30"
@@ -14,8 +14,8 @@ analysis_metadata:
   explicit_high_risk_request: false
 
   data_freshness_control:
-    current_date: "2026-09-05"
-    data_age_days: 128
+    current_date: "2026-10-30"
+    data_age_days: 122
     max_allowed_age_days: 365
 
   report_type: "annual"
@@ -25,16 +25,16 @@ analysis_metadata:
   valuation_policy:
     primary_method: "PE"
     pe_applicable: true
-    price_as_of: "2026-09-04"
-    fx_as_of: "2026-09-04"
+    price_as_of: "2026-10-29"
+    fx_as_of: "2026-10-29"
     calculation_currency: "RMB"
-    share_price_to_calculation_currency_rate: 0.8559
-    fx_source: "https://cn.investing.com/currencies/hkd-cny-historical-data (2026-09-04 daily close)"
+    share_price_to_calculation_currency_rate: 0.84901
+    fx_source: "https://api.frankfurter.app/latest?from=HKD&to=CNY (2026-10-29 ECB reference rate)"
     ttm_period: "2025-07-01/2026-06-30"
     ttm_method: "ANNUAL_PLUS_INTERIM"
     ttm_unavailable_reason: ""
 
-  data_confidence_level: "S/B"
+  data_confidence_level: "S/A/B"
 
   validation_checks:
     - check: "使用的是最新完整年度年报（非中报/季报/预告）"
@@ -233,14 +233,14 @@ core_financial_data:
     confidence: "S"
 
   share_price:
-    value: 28.76
+    value: 26.14
     currency: "HKD"
-    date: "2026-09-04"
-    source: "https://cn.investing.com/equities/poly-property-development-co-ltd-historical-data"
+    date: "2026-10-29"
+    source: "https://quote.eastmoney.com/hk/06049.html (2026-10-29 close; Tencent quote prev-close cross-check 26.14)"
 
   market_cap:
     calculation: "total_shares * share_price * share_price_to_calculation_currency_rate"
-    value: 13620680121.045599
+    value: 12280195320.87476
     unit: "RMB"
     display_unit: "亿元人民币"
 
@@ -249,24 +249,24 @@ core_financial_data:
       formula: "cash_and_cash_equivalents - lease_liabilities"
       value: 10608278000
       display_value: "106.08亿元人民币"
-      market_cap_ratio: 0.7788361451649486
-      notes: "现金及现金等价物107.09927亿元减租赁负债1.01649亿元；排除原始期限24-36个月的定期存款，更接近随时可动用口径。"
+      market_cap_ratio: 0.8638525465443767
+      notes: "现金及现金等价物107.09927亿元减租赁负债1.01649亿元；排除原始期限24-36个月的定期存款，更接近随时可动用口径。按2026-10-29人民币市值122.80195亿元为81.78%。"
       confidence: "A"
 
     conservative_immediate_net_cash:
       formula: "cash_and_cash_equivalents - poly_finance_deposits - lease_liabilities"
       value: 8638983000
       display_value: "86.39亿元人民币"
-      market_cap_ratio: 0.6342548920631156
-      notes: "在即时净现金基础上进一步剔除保利财务存款19.69295亿元的审慎口径。"
+      market_cap_ratio: 0.703489054878047
+      notes: "在即时净现金基础上进一步剔除保利财务存款19.69295亿元的审慎口径；2026H1实际余额20.23012亿元，扣除后审慎净现金80.19121亿元、占市值65.30%。"
       confidence: "A"
 
     net_cash:
       formula: "cash_and_bank_balances - restricted_cash - interest_bearing_debt.total"
       value: 12784251000
       display_value: "127.84亿元人民币"
-      market_cap_ratio: 0.9385912367361734
-      notes: "广义净现金口径，包含原始期限24-36个月的定期存款本金约21.76亿元，不等于全部随时可动用。"
+      market_cap_ratio: 1.0410462265423752
+      notes: "广义净现金口径，包含原始期限24-36个月的定期存款本金约21.76亿元，不等于全部随时可动用。按2026-10-29市值104.10%。"
       confidence: "A"
 
     fcf:
@@ -284,18 +284,18 @@ core_financial_data:
 
     market_cap_ex_cash:
       formula: "market_cap - net_cash"
-      value: 836429121.045599
-      display_value: "8.36429亿元人民币"
+      value: -504055679.1252403
+      display_value: "-5.04056亿元人民币"
 
     fcf_yield:
       formula: "fcf / market_cap"
-      value: 0.13057057240864678
-      display_value: "13.06%"
+      value: 0.14482342939422516
+      display_value: "14.48%"
 
     fcf_multiple_market:
       formula: "market_cap / fcf"
-      value: 7.65869354444047
-      display_value: "7.66倍"
+      value: 6.904960089557685
+      display_value: "6.90倍"
 
     multi_period_fcf:
       method: "THREE_YEAR_AVERAGE"
@@ -313,30 +313,30 @@ core_financial_data:
           source: 2025_annual_report_cash_flow_statement_page_84
           page_number: 84
       average_value: 1838019666.6666667
-      market_cap_yield: 0.1349433104905462
+      market_cap_yield: 0.14967348797313254
       unavailable_reason: ""
       confidence: "A"
 
     dividend_yield:
       formula: "dividend_per_share_for_yield / share_price"
-      value: 0.05587830319888734
-      display_value: "5.59%"
+      value: 0.061478959449120116
+      display_value: "6.15%"
       notes: "股息是FCF的分配组成，不与FCF收益率相加。"
 
     fcf_multiple_ex_cash:
       formula: "market_cap_ex_cash / fcf"
-      value: 0.47031089878074234
-      display_value: "0.47倍"
+      value: -0.28342255610204353
+      display_value: "-0.28倍"
 
     pe_ratio:
       formula: "market_cap / net_profit_attributable"
-      value: 8.790654826580786
-      display_value: "8.79倍"
+      value: 7.925518939542909
+      display_value: "7.93倍"
 
     static_pe:
       formula: "market_cap / net_profit_attributable"
-      value: 8.790654826580786
-      display_value: "8.79倍"
+      value: 7.925518939542909
+      display_value: "7.93倍"
 
     ttm_net_profit:
       formula: "sum(ttm_components.operator * ttm_components.value)"
@@ -345,13 +345,13 @@ core_financial_data:
 
     ttm_pe:
       formula: "market_cap / ttm_net_profit"
-      value: 8.553908992111955
-      display_value: "8.55倍"
+      value: 7.712072543118944
+      display_value: "7.71倍"
 
     pb_ratio:
       formula: "market_cap / equity_attributable_to_owners"
-      value: 1.2906468424599333
-      display_value: "1.29倍"
+      value: 1.1636273060395144
+      display_value: "1.16倍"
 
     debt_to_asset_ratio:
       formula: "total_liabilities / total_assets"
@@ -360,8 +360,8 @@ core_financial_data:
 
     cash_to_market_cap_ratio:
       formula: "net_cash / market_cap"
-      value: 0.9385912367361734
-      display_value: "93.86%"
+      value: 1.0410462265423752
+      display_value: "104.10%"
 
   latest_interim_supplement:
     period: '2026-06-30'
@@ -379,23 +379,25 @@ core_financial_data:
     total_liabilities: 7900474000
     contract_liabilities: 2077299000
     cash_less_all_liabilities: 2231042000
-    cash_less_all_liabilities_to_market_cap_percent: 16.37981349
+    cash_less_all_liabilities_to_market_cap_percent: 18.16780549
     cash_less_liabilities_excluding_contract_liabilities: 4308341000
     primary_cash_metric: cash_and_cash_equivalents_minus_interest_bearing_debt_including_leases
     primary_net_cash: 10042133000
-    primary_net_cash_to_market_cap_percent: 73.72710401
-    primary_cash_metric_notes: 主展示约74%；排除单列定期存款，未扣应付及合同负债等经营负债，不等于银行活期或自由分配现金；现金时点2026-06-30，市值时点2026-09-04。
+    primary_net_cash_to_market_cap_percent: 81.77502668
+    primary_cash_metric_notes: 主展示81.78%；排除单列定期存款，未扣应付及合同负债等经营负债，不等于银行活期或自由分配现金；现金时点2026-06-30，市值时点2026-10-29。
     freely_available_bank_cash_after_liabilities: null
     all_liabilities_cash_notes: 现金等价物减全部负债；合同负债主要靠服务履约，但全额加回未预留服务成本；关联存款和资金限制未核实，不视为自由现金，应付股息不重复扣减。
     trade_and_bills_receivables_net: 4433191000
     receivables_over_one_year_net: 518869000
     related_trade_receivables_gross: 738032000
-    related_financial_institution_deposits: null
+    related_financial_institution_deposits: 2023012000
     related_deposit_contract_cap: 2030000000
-    operating_cash_flow: null
-    capex: null
-    fcf: null
-    notes: 中期公告无现金流量表、无保利财务期末存款余额；不从现金变动倒推OCF，不将年度余额当最新余额。审慎现金仅展示遵守20.3亿元存款上限前提下的边界。
+    related_deposit_to_cash_equivalents_percent: 19.96751523
+    related_deposit_to_contract_cap_percent: 99.65576355
+    operating_cash_flow: -481903000
+    capex: 62656000
+    fcf: -544559000
+    notes: 中期报告含现金流量表：OCF-4.81903亿元、PPE支出0.62656亿元；中期FCF-5.44559亿元，不年化。TTM FCF按年度+本期中期-上年同期中期为14.82250亿元。关联存款20.23012亿元，占现金等价物19.97%、占年度上限20.30亿元的99.66%。
 
 historical_comparison:
   years:
@@ -537,7 +539,7 @@ validation_checklist:
   - id: "data_freshness"
     item: "数据时效性：确认使用最新完整年度年报，非中报/季报数据"
     checked: true
-    freshness_explanation: "2026H1利润已公告，TTM已更新；完整中期现金流和保利财务存款期末余额尚未披露，不能核实最新FCF。"
+    freshness_explanation: "2026中期报告已披露完整现金流量表及保利财务存款余额，TTM OCF/FCF可复算；下一期财报前关注应收账龄与存款压降。"
   - id: "shareholder_relationship"
     item: "股东关系：已完成资本市场养分测试并给出标签"
     checked: true
@@ -555,8 +557,8 @@ data_corrections:
       date: "2026-08-20"
 
 confidence_downgrade_reasons:
-  - reason: "核心年度财务数据为S级；股价与汇率为外部市场数据，估值整体按B级行情置信度展示。"
-  - reason: "2026H1利润已公告，TTM已更新；完整中期现金流和保利财务存款期末余额尚未披露，不能核实最新FCF。"
+  - reason: "核心年度财务数据为S级；2026中期报告按A级（经审阅未审计）处理；股价与汇率为外部市场数据，估值整体按B级行情置信度展示。"
+  - reason: "2026中期报告已披露完整现金流及关联存款余额，TTM FCF可复算；长账龄应收与存款上限使用仍需下一期核实。"
 
 confirmation:
   i_confirm:
@@ -566,15 +568,15 @@ confirmation:
     - "与上期数据对比合理，异常变动已解释"
     - "了解数据错误将导致分析报告作废"
   analyst_signature: "Codex"
-  validation_date: "2026-09-05"
+  validation_date: "2026-10-30"
 research_decision:
-  as_of: '2026-09-06'
-  template_revision: 2026-09-05-r5
+  as_of: '2026-10-30'
+  template_revision: 2026-10-10-r7
   action: 可分批买入；已有仓位可持有，暂不直接配足10%
   current_simulated_position_percent: 0
   position_ceiling_percent: 10
   current_new_allocation_percent: null
   current_ordinary_position_ceiling_percent: 8
-  next_review: '2026-09-30'
-  reason: 低估值支持分批买入；回款预警和现金流缺失限制仓位与加仓，不单独推出零仓位；主要展示账面净现金73.73%，未扣经营负债；严格扣全部负债16.38%仅作对照，两者均非已核实自由现金。
+  next_review: '2027-01-10'
+  reason: TTM PE 7.71倍、TTM FCF/市值12.07%支持分批买入；税后普通股息率4.92%未达5%分配门槛、长账龄应收同比+91.1%、关联存款已达年度上限99.7%，限制仓位与加仓，不单独推出零仓位；主展示账面净现金81.78%，未扣经营负债；扣全部负债18.17%仅作对照，两者均非已核实自由现金。
   not_executed: true

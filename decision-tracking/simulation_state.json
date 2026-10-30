@@ -167,7 +167,7 @@
       "shares": 0,
       "avg_cost": 0.0,
       "sell_trigger": 70.2,
-      "target_buy": 52.0,
+      "target_buy": 43.2,
       "lot_size": 100,
       "realized_pnl": 0.0
     },
